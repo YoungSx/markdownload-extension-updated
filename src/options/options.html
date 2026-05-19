@@ -305,6 +305,9 @@
                     </div>
                 </details>
 
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupFilenameTemplates">Filename Templates</h3>
+
                 <!-- Title template -->
                 <div class="setting-card" id="includeTemplate-container"
                     data-search-keywords="append template,template toggle,frontmatter,front matter,backmatter,back matter"
@@ -330,6 +333,10 @@
                         <input type="text" id="disallowedCharReplacement" name="disallowedCharReplacement" class="text-input" role="textbox" placeholder="Leave blank to strip" />
                     </div>
                 </div>
+                </div>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupContentTemplates">Content Templates</h3>
 
                 <!-- Front-matter -->
                 <div class="setting-card" data-setting-key="frontmatter">
@@ -385,6 +392,7 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -447,6 +455,9 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupThemeColors">Theme &amp; Colors</h3>
 
                 <!-- Color Mode -->
                 <div class="setting-card" id="popupThemeGroup" data-setting-key="popupTheme,showThemeToggleInPopup" data-search-keywords="theme toggle,dark mode toggle,light mode toggle,popup header theme button,appearance">
@@ -619,6 +630,7 @@
                         </div>
                     </div>
                 </div>
+                </div>
 
                 <!-- Popup Behavior -->
                 <div class="setting-card" id="popupBehaviorGroup"
@@ -692,6 +704,9 @@
             <div class="section" id="section-downloads" data-section-label="Exports &amp; Integrations" role="tabpanel" tabindex="0" aria-labelledby="tab-downloads">
                 <h2 class="section-title">Exports &amp; Integrations</h2>
                 <p class="section-desc">Configure how files are exported and manage integrations with Obsidian, assistants, and the Agent Bridge.</p>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupPopupMenus">Popup &amp; Menus</h3>
 
                 <!-- Context Menus -->
                 <div class="setting-card" id="contextMenus-container"
@@ -845,6 +860,10 @@
                         </div>
                     </div>
                 </div>
+                </div>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupDownloads">Downloads</h3>
 
                 <!-- Download Mode -->
                 <div class="setting-card" id="downloadMode"
@@ -911,6 +930,10 @@
                         </div>
                     </div>
                 </div>
+                </div>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupAssistantIntegration">Assistant Integration</h3>
 
                 <div class="setting-card" id="defaultSendToTargetCard"
                     data-search-keywords="default assistant target,send to target,chatgpt,claude,perplexity,custom assistant,custom url"
@@ -963,6 +986,7 @@
                         <label class="input-label" for="sendToMaxUrlLength">Maximum URL Length</label>
                         <input type="number" id="sendToMaxUrlLength" name="sendToMaxUrlLength" class="text-input" role="spinbutton" min="1" step="100" inputmode="numeric" />
                     </div>
+                </div>
                 </div>
 
                 <!-- Webhook Targets -->
@@ -1208,6 +1232,9 @@
                 <h2 class="section-title">Markdown</h2>
                 <p class="section-desc">Configure how HTML is converted to Markdown syntax.</p>
 
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupBlockElements">Block Elements</h3>
+
                 <!-- Heading Style -->
                 <div class="setting-card" id="headingStyle" data-setting-key="headingStyle">
                     <h3 class="card-title">Heading Style</h3>
@@ -1337,6 +1364,11 @@ const helloWorld = () => {
                     </div>
                 </div>
 
+                </div>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupInlineFormatting">Inline Formatting</h3>
+
                 <!-- Emphasis Delimiter -->
                 <div class="setting-card" id="emDelimiter" data-setting-key="emDelimiter">
                     <h3 class="card-title">Emphasis (italics) Delimiter</h3>
@@ -1370,6 +1402,11 @@ const helloWorld = () => {
                         </div>
                     </div>
                 </div>
+
+                </div>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupLinks">Links</h3>
 
                 <!-- Link Style -->
                 <div class="setting-card" id="linkStyle" data-setting-key="linkStyle">
@@ -1434,6 +1471,11 @@ const helloWorld = () => {
                         </div>
                     </div>
                 </div>
+
+                </div>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupImages">Images</h3>
 
                 <!-- Image Style -->
                 <div class="setting-card" id="imageOptions"
@@ -1515,6 +1557,11 @@ const helloWorld = () => {
                     </div>
                 </div>
 
+                </div>
+
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupContentFiltering">Content Filtering</h3>
+
                 <!-- Escape Markdown -->
                 <div class="setting-card" id="turndownEscape-container" data-setting-key="turndownEscape">
                     <div class="toggle-row">
@@ -1580,6 +1627,7 @@ const helloWorld = () => {
                         Example: <code>#research</code> becomes <code>research</code> in <strong>Remove #</strong>,
                         or <code>\#research</code> in <strong>Escape #</strong>.
                     </p>
+                </div>
                 </div>
             </div>
 
@@ -1936,6 +1984,9 @@ const helloWorld = () => {
                     </details>
                 </div>
 
+                <div class="setting-subgroup">
+                <h3 class="setting-subgroup__label" data-i18n="optionsSubgroupDataTransfer">Data Transfer</h3>
+
                 <div class="setting-card">
                     <h3 class="card-title">Import</h3>
                     <p class="card-desc">Restore options from a previously exported backup file.</p>
@@ -1965,6 +2016,8 @@ const helloWorld = () => {
                             Export
                         </button>
                     </div>
+                </div>
+
                 </div>
 
                 <div class="setting-card">

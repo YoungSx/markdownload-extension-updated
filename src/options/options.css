@@ -3674,6 +3674,41 @@ code {
 }
 
 
+/* ── Setting Subgroup ──
+   Binds related cards using typography + rhythm only —
+   no borders, no container chrome. */
+.setting-subgroup {
+    margin: var(--space-8) 0;
+}
+
+.setting-subgroup:first-child { margin-top: 0; }
+.setting-subgroup:last-child  { margin-bottom: 0; }
+
+.setting-subgroup__label {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 var(--space-3);
+    padding-left: var(--space-1);
+}
+
+.setting-subgroup .setting-card {
+    margin-bottom: var(--space-2);
+}
+
+.setting-subgroup > .setting-card:last-child,
+.setting-subgroup > *:last-child > .setting-card:last-child {
+    margin-bottom: 0;
+}
+
+.setting-subgroup:not(:has(.setting-card:not(.search-hidden))) {
+    display: none;
+}
+
+
 /* ── Sub-section Divider ── */
 .setting-divider {
     height: 1px;
