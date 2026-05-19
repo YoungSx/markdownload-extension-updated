@@ -232,7 +232,7 @@
     "description": "Button label for activating manual element picker mode"
   },
   "popupPickElementStarting": {
-    "message": "Pick on page...",
+    "message": "Picking on page...",
     "description": "Temporary popup feedback after activating element picker mode"
   },
   "popupPickElementFailed": {

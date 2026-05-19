@@ -194,8 +194,8 @@
 
 	    <!-- Quick Settings -->
 	    <section class="settings-panel">
-	      <div class="toggle-row">
-	        <div class="toggle-setting">
+	      <div class="toggle-row quick-actions-row" role="group" aria-label="Clip options">
+	        <div class="quick-option quick-option--toggle">
 	          <label class="toggle-label" for="downloadImages">
 	            <span class="toggle-text">Images</span>
 	            <div class="toggle-switch">
@@ -205,7 +205,8 @@
 	          </label>
 	          <p class="toggle-override-note" id="downloadImagesRuleHint" hidden></p>
 	        </div>
-	        <div class="toggle-setting">
+	        <span class="quick-actions-divider" aria-hidden="true"></span>
+	        <div class="quick-option quick-option--toggle">
 	          <label class="toggle-label" for="includeTemplate">
 	            <span class="toggle-text">Template</span>
 	            <div class="toggle-switch">
@@ -214,6 +215,37 @@
 	            </div>
 	          </label>
 	          <p class="toggle-override-note" id="includeTemplateRuleHint" hidden></p>
+	        </div>
+	        <div class="quick-option quick-option--picker element-picker-row" id="elementPickerRow">
+	          <span class="quick-actions-divider" aria-hidden="true"></span>
+	          <button id="pickElement" class="element-picker-trigger" type="button" title="Pick Element" aria-label="Pick Element" data-state="idle">
+	            <span class="element-picker-icon" aria-hidden="true">
+	              <svg class="element-picker-state-icon" data-picker-icon="idle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M3 3h6"/>
+	                <path d="M3 3v6"/>
+	                <path d="M21 3h-6"/>
+	                <path d="M21 3v6"/>
+	                <path d="M3 21h6"/>
+	                <path d="M3 21v-6"/>
+	                <path d="M21 21h-6"/>
+	                <path d="M21 21v-6"/>
+	                <path d="M8 12h8"/>
+	                <path d="M12 8v8"/>
+	              </svg>
+	              <svg class="element-picker-state-icon" data-picker-icon="pending" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round">
+	                <path d="M12 3a9 9 0 0 1 9 9"/>
+	                <path d="M12 21a9 9 0 0 1-9-9"/>
+	              </svg>
+	              <svg class="element-picker-state-icon" data-picker-icon="success" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M20 6 9 17l-5-5"/>
+	              </svg>
+	              <svg class="element-picker-state-icon" data-picker-icon="error" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M18 6 6 18"/>
+	                <path d="m6 6 12 12"/>
+	              </svg>
+	            </span>
+	            <span class="element-picker-label">Pick Element</span>
+	          </button>
 	        </div>
 	      </div>
 
@@ -231,26 +263,6 @@
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
             </svg>
             Document
-          </button>
-        </div>
-      </div>
-      <div class="setting-row element-picker-row" id="elementPickerRow">
-        <span class="setting-text-static">Manual:</span>
-        <div class="content-scope-actions">
-          <button id="pickElement" class="element-picker-trigger" type="button" title="Pick Element" aria-label="Pick Element">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 3h6"/>
-              <path d="M3 3v6"/>
-              <path d="M21 3h-6"/>
-              <path d="M21 3v6"/>
-              <path d="M3 21h6"/>
-              <path d="M3 21v-6"/>
-              <path d="M21 21h-6"/>
-              <path d="M21 21v-6"/>
-              <path d="M8 12h8"/>
-              <path d="M12 8v8"/>
-            </svg>
-            <span>Pick Element</span>
           </button>
         </div>
       </div>

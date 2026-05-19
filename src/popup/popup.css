@@ -1228,7 +1228,7 @@ body {
 /* Settings Panel */
 .settings-panel {
     flex-shrink: 0;
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-3) 14px;
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-light);
     animation: fadeIn 300ms ease-out 50ms backwards;
@@ -1237,29 +1237,74 @@ body {
 
 /* Toggle Row — side-by-side toggle switches */
 .toggle-row {
-	    display: flex;
-	    align-items: flex-start;
-	    gap: var(--space-4);
-	    padding: var(--space-2) 0;
-	    border-bottom: 1px solid var(--border-light);
+    display: grid;
+    grid-template-columns: max-content 1px max-content minmax(0, 1fr);
+    align-items: center;
+    column-gap: 10px;
+    min-height: 48px;
+    padding: 8px;
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--bg-primary) 92%, transparent),
+            color-mix(in srgb, var(--bg-primary) 78%, var(--bg-secondary))
+        );
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-xl);
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--text-inverse) 28%, transparent),
+        0 1px 2px rgba(0, 0, 0, 0.03);
+    transition:
+        background var(--theme-transition),
+        border-color var(--theme-transition),
+        box-shadow var(--theme-transition);
 }
 
-.toggle-setting {
-	    flex: 1;
-	    min-width: 0;
+.toggle-row.is-picker-hidden {
+    grid-template-columns: max-content 1px max-content;
+    justify-content: start;
+}
+
+.quick-option {
+    min-width: 0;
+}
+
+.quick-option--toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.quick-option--picker {
+    display: grid;
+    grid-template-columns: 1px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.quick-actions-divider {
+    display: block;
+    width: 1px;
+    height: 28px;
+    background: color-mix(in srgb, var(--border-medium) 72%, transparent);
+    justify-self: center;
+    transition: background-color var(--theme-transition);
 }
 
 .toggle-label {
-	    display: flex;
-	    align-items: center;
-	    gap: var(--space-2);
-	    cursor: pointer;
-	    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
 }
 
 .toggle-label.is-locked {
-	    cursor: not-allowed;
-	    opacity: 0.78;
+    cursor: not-allowed;
+    opacity: 0.78;
 }
 
 .toggle-text {
@@ -1313,16 +1358,26 @@ body {
     transform: translateX(16px);
 }
 
+.quick-actions-row .toggle-switch {
+    width: 34px;
+}
+
+.quick-actions-row .toggle-input:checked + .toggle-slider::after {
+    transform: translateX(14px);
+}
+
 .toggle-input:focus-visible + .toggle-slider {
-	    outline: 2px solid var(--accent);
-	    outline-offset: 2px;
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 .toggle-override-note {
-	    margin-top: 0.35rem;
-	    font-size: var(--text-xs);
-	    line-height: 1.45;
-	    color: var(--text-secondary);
+    max-width: 110px;
+    margin-top: 0;
+    font-size: 10px;
+    line-height: 1.3;
+    color: var(--text-secondary);
+    text-align: center;
 }
 
 /* Setting row (clip option, etc.) */
@@ -1331,26 +1386,13 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
-    padding: var(--space-2) 0;
+    padding: var(--space-2) 0 0;
 }
 
 .setting-text-static {
     font-size: var(--text-sm);
     color: var(--text-secondary);
     font-weight: var(--weight-medium);
-}
-
-.content-scope-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: var(--space-2);
-    min-width: 0;
-    flex: 1;
-}
-
-.element-picker-row {
-    padding-top: 0;
 }
 
 .element-picker-row[hidden] {
@@ -1413,14 +1455,15 @@ body {
 }
 
 .element-picker-trigger {
-    flex: 1;
     display: inline-flex;
+    position: relative;
     align-items: center;
     justify-content: center;
-    gap: var(--space-1);
-    min-height: 32px;
+    gap: 6px;
+    min-height: 34px;
     min-width: 0;
-    padding: var(--space-2) var(--space-3);
+    width: 100%;
+    padding: 8px 10px;
     border: 1px solid var(--border-medium);
     border-radius: var(--radius-md);
     background: var(--bg-primary);
@@ -1430,20 +1473,54 @@ body {
     line-height: 1.1;
     cursor: pointer;
     white-space: nowrap;
+    overflow: hidden;
     transition:
         background-color var(--transition),
         border-color var(--transition),
         color var(--transition),
+        box-shadow var(--transition),
         transform var(--transition-fast);
 }
 
-.element-picker-trigger svg {
-    flex: 0 0 auto;
+.element-picker-icon,
+.element-picker-state-icon {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
 }
 
-.element-picker-trigger span {
+.element-picker-icon {
+    display: inline-grid;
+    place-items: center;
+}
+
+.element-picker-state-icon {
+    display: none;
+    grid-area: 1 / 1;
+}
+
+.element-picker-label {
+    display: block;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left;
+}
+
+.element-picker-trigger[data-state="idle"] [data-picker-icon="idle"],
+.element-picker-trigger[data-state="pending"] [data-picker-icon="pending"],
+.element-picker-trigger[data-state="success"] [data-picker-icon="success"],
+.element-picker-trigger[data-state="error"] [data-picker-icon="error"] {
+    display: block;
+}
+
+.element-picker-trigger[data-state="pending"] [data-picker-icon="pending"] {
+    animation: element-picker-spin 0.72s linear infinite;
+}
+
+@keyframes element-picker-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1463,16 +1540,27 @@ body {
     outline-offset: 2px;
 }
 
-.element-picker-trigger.success {
-    background: var(--success);
-    border-color: var(--success);
-    color: var(--text-inverse);
+.element-picker-trigger[data-state="pending"] {
+    background: color-mix(in srgb, var(--accent) 14%, var(--bg-primary));
+    border-color: color-mix(in srgb, var(--accent) 42%, var(--border-medium));
+    color: var(--accent-dark);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
-.element-picker-trigger.error {
-    background: var(--error);
-    border-color: var(--error);
-    color: var(--text-inverse);
+.element-picker-trigger.success,
+.element-picker-trigger[data-state="success"] {
+    background: color-mix(in srgb, var(--success) 16%, var(--bg-primary));
+    border-color: color-mix(in srgb, var(--success) 45%, var(--border-medium));
+    color: var(--success);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--success) 12%, transparent);
+}
+
+.element-picker-trigger.error,
+.element-picker-trigger[data-state="error"] {
+    background: color-mix(in srgb, var(--error) 14%, var(--bg-primary));
+    border-color: color-mix(in srgb, var(--error) 45%, var(--border-medium));
+    color: var(--error);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--error) 12%, transparent);
 }
 
 /* Title Section */

@@ -2105,12 +2105,14 @@ function setElementPickerButtonFeedback(label, state = null) {
         return;
     }
 
+    const normalizedState = ['pending', 'success', 'error'].includes(state) ? state : 'idle';
     button.classList.remove('success', 'error');
-    if (state) {
-        button.classList.add(state);
+    if (normalizedState === 'success' || normalizedState === 'error') {
+        button.classList.add(normalizedState);
     }
+    button.dataset.state = normalizedState;
 
-    const labelElement = button.querySelector('span');
+    const labelElement = button.querySelector('.element-picker-label') || button.querySelector('span');
     if (labelElement) {
         labelElement.textContent = label;
     }
@@ -2140,7 +2142,7 @@ async function activateElementPicker(e) {
             return;
         }
 
-        setElementPickerButtonFeedback(popupMessage('popupPickElementStarting', null, 'Pick on page...'), 'success');
+        setElementPickerButtonFeedback(popupMessage('popupPickElementStarting', null, 'Picking on page...'), 'pending');
 
         await browser.scripting.executeScript({
             target: { tabId: activeTab.id },
@@ -2159,6 +2161,7 @@ async function activateElementPicker(e) {
             throw new Error(response.error || popupMessage('popupAlertFailedToActivateElementPicker', null, 'Failed to activate element picker. Please try again.'));
         }
 
+        setElementPickerButtonFeedback(popupMessage('popupPickElementStarting', null, 'Picking on page...'), 'success');
         await browser.tabs.update(activeTab.id, { active: true });
         setTimeout(resetElementPickerButtonFeedback, 1200);
     } catch (error) {
@@ -2322,6 +2325,7 @@ const updateElementPickerButtonVisibility = (options) => {
     target.hidden = !shouldShow;
     target.style.display = shouldShow ? "" : "none";
     target.setAttribute("aria-hidden", String(!shouldShow));
+    target.closest('.quick-actions-row')?.classList.toggle('is-picker-hidden', !shouldShow);
     if (dom.pickElementButton) {
         dom.pickElementButton.disabled = !shouldShow;
     }
