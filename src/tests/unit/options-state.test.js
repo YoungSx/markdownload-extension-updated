@@ -3,6 +3,23 @@ const optionsState = require('../../shared/options-state');
 describe('options-state helpers', () => {
 const defaultOptions = {
   contextMenus: true,
+  contextMenuItems: {
+    downloadTab: true,
+    downloadAllTabs: true,
+    downloadSelection: true,
+    pickElement: true,
+    copySelection: true,
+    copyLink: true,
+    copyImage: true,
+    copyTab: true,
+    copyTabLink: true,
+    copyAllTabLinks: true,
+    copySelectedTabLinks: true,
+    sendSelectionToObsidian: true,
+    sendTabToObsidian: true,
+    toggleIncludeTemplate: true,
+    toggleDownloadImages: true
+  },
   batchProcessingEnabled: true,
   includeTemplate: false,
   imagePrefix: '{pageTitle}/',
@@ -13,6 +30,8 @@ const defaultOptions = {
   webhookTargets: [],
   specialTheme: 'none',
   colorBlindTheme: 'deuteranopia',
+  elementPickerEnabled: true,
+  elementPickerDoneAction: 'popup',
   showUserGuideIcon: true,
   siteRules: [],
   tableFormatting: {
@@ -50,6 +69,21 @@ const defaultOptions = {
       prettyPrint: true,
       centerText: true
     });
+  });
+
+  test('normalizeImportedOptions merges and sanitizes context menu item preferences', () => {
+    const normalized = optionsState.normalizeImportedOptions({
+      contextMenuItems: {
+        downloadTab: false,
+        copyLink: true,
+        unknownItem: false
+      }
+    }, defaultOptions);
+
+    expect(normalized.contextMenuItems.downloadTab).toBe(false);
+    expect(normalized.contextMenuItems.copyLink).toBe(true);
+    expect(normalized.contextMenuItems.copyImage).toBe(true);
+    expect(normalized.contextMenuItems.unknownItem).toBeUndefined();
   });
 
   test('normalizeImportedOptions does not mutate inputs', () => {
@@ -219,6 +253,20 @@ const defaultOptions = {
     expect(result.contextMenuAction).toBe('create');
   });
 
+  test('resetOptionKeys recreates context menus when item preferences change while enabled', () => {
+    const currentOptions = {
+      ...defaultOptions,
+      contextMenuItems: {
+        ...defaultOptions.contextMenuItems,
+        copyImage: false
+      }
+    };
+
+    const result = optionsState.resetOptionKeys(currentOptions, defaultOptions, ['contextMenuItems']);
+    expect(result.options.contextMenuItems.copyImage).toBe(true);
+    expect(result.contextMenuAction).toBe('create');
+  });
+
   test('resetAllOptions returns cloned defaults and context menu transition', () => {
     const defaultsWithoutMenus = {
       ...defaultOptions,
@@ -239,6 +287,7 @@ test('normalizeImportedOptions ignores non-plain option inputs', () => {
   const normalized = optionsState.normalizeImportedOptions('text', 123);
   expect(normalized).toEqual({
     tableFormatting: {},
+    contextMenuItems: {},
     siteRules: [],
     defaultExportType: 'markdown',
     defaultSendToTarget: 'chatgpt',
@@ -272,6 +321,7 @@ test('resetAllOptions handles non-plain defaults without blowing up', () => {
   const result = optionsState.resetAllOptions({ contextMenus: true }, null);
   expect(result.options).toEqual({
     tableFormatting: {},
+    contextMenuItems: {},
     siteRules: [],
     defaultExportType: 'markdown',
     defaultSendToTarget: 'chatgpt',
@@ -379,6 +429,30 @@ test('resetOptionKeys restores the batch processing toggle to its default', () =
   const result = optionsState.resetOptionKeys(current, defaultOptions, ['batchProcessingEnabled']);
 
   expect(result.options.batchProcessingEnabled).toBe(true);
+  expect(result.contextMenuAction).toBe('none');
+});
+
+test('resetOptionKeys restores the element picker toggle to its default', () => {
+  const current = {
+    ...defaultOptions,
+    elementPickerEnabled: false
+  };
+
+  const result = optionsState.resetOptionKeys(current, defaultOptions, ['elementPickerEnabled']);
+
+  expect(result.options.elementPickerEnabled).toBe(true);
+  expect(result.contextMenuAction).toBe('none');
+});
+
+test('resetOptionKeys restores the element picker done action to its default', () => {
+  const current = {
+    ...defaultOptions,
+    elementPickerDoneAction: 'copy'
+  };
+
+  const result = optionsState.resetOptionKeys(current, defaultOptions, ['elementPickerDoneAction']);
+
+  expect(result.options.elementPickerDoneAction).toBe('popup');
   expect(result.contextMenuAction).toBe('none');
 });
 

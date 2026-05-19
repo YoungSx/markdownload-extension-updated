@@ -191,9 +191,9 @@ author: {byline}
 
 ### Context Menus
 
-Toggles the right-click context menu items on and off.
+Toggles the right-click context menu items on and off. Use **Visible Menu Items** to choose the individual MarkSnip actions that are allowed to appear. Browsers only show items that apply to where you right-click, such as page, selection, link, image, or tab menus.
 
-**Default:** On
+**Default:** On, with all menu items visible
 
 ### Default Popup Export Format
 

@@ -308,6 +308,145 @@ function getSelectionAndDom(captureOptions = {}) {
     }
   }
 
+function removeMarkSnipElementPickerArtifacts(root) {
+    if (!root || root.nodeType !== Node.ELEMENT_NODE) {
+        return;
+    }
+
+    const nodes = [root, ...Array.from(root.querySelectorAll('*'))];
+    nodes.forEach(node => {
+        if (node.getAttribute?.('data-marksnip-element-picker-ui') === 'true') {
+            node.remove();
+            return;
+        }
+
+        if (node.classList) {
+            Array.from(node.classList).forEach(className => {
+                if (className.startsWith('marksnip-element-picker-')) {
+                    node.classList.remove(className);
+                }
+            });
+            if (node.getAttribute('class') === '') {
+                node.removeAttribute('class');
+            }
+        }
+    });
+}
+
+function cleanElementCloneForMarkdown(sourceElement, clonedElement, captureOptions = {}) {
+    if (!clonedElement || clonedElement.nodeType !== Node.ELEMENT_NODE) {
+        return null;
+    }
+
+    if (shouldSkipHiddenContent(captureOptions)) {
+        removeHiddenNodes(sourceElement, clonedElement);
+    }
+
+    removeMarkSnipElementPickerArtifacts(clonedElement);
+
+    clonedElement.querySelectorAll('script, style, noscript').forEach(node => node.remove());
+
+    return clonedElement;
+}
+
+function getElementHtmlForMarkdown(clonedElement) {
+    if (!clonedElement) {
+        return '';
+    }
+
+    const tagName = String(clonedElement.tagName || '').toUpperCase();
+    if (tagName === 'HTML') {
+        return clonedElement.querySelector('body')?.innerHTML || clonedElement.innerHTML || '';
+    }
+    if (tagName === 'BODY') {
+        return clonedElement.innerHTML || '';
+    }
+
+    return clonedElement.outerHTML || '';
+}
+
+function normalizeElementPickerText(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function deriveElementPickerTitle(clonedElement) {
+    const heading = clonedElement?.matches?.('h1,h2,h3,h4,h5,h6')
+        ? clonedElement
+        : clonedElement?.querySelector?.('h1,h2,h3,h4,h5,h6');
+    const headingText = normalizeElementPickerText(heading?.textContent);
+    if (headingText) {
+        return headingText;
+    }
+
+    const accessibleLabel = normalizeElementPickerText(
+        clonedElement?.getAttribute?.('aria-label') ||
+        clonedElement?.getAttribute?.('alt') ||
+        clonedElement?.getAttribute?.('title')
+    );
+    if (accessibleLabel) {
+        return accessibleLabel;
+    }
+
+    const textFallback = normalizeElementPickerText(clonedElement?.textContent).slice(0, 80);
+    return textFallback || document.title || 'Selected Element';
+}
+
+function getElementPickerLabel(element) {
+    if (!element || element.nodeType !== Node.ELEMENT_NODE) {
+        return '';
+    }
+
+    const tag = String(element.tagName || '').toLowerCase();
+    const id = element.id ? `#${element.id}` : '';
+    const classNames = Array.from(element.classList || [])
+        .filter(className => !className.startsWith('marksnip-element-picker-'))
+        .slice(0, 2)
+        .map(className => `.${className}`)
+        .join('');
+    return `${tag}${id}${classNames}`;
+}
+
+function buildDomWithManualElement(elementHtml, captureOptions = {}) {
+    const domString = getHTMLOfDocument(captureOptions);
+    const parser = new DOMParser();
+    const dom = parser.parseFromString(domString, 'text/html');
+
+    if (dom.documentElement.nodeName === 'parsererror' || !dom.body) {
+        return domString;
+    }
+
+    dom.querySelectorAll('[data-marksnip-element-picker-ui="true"]').forEach(node => node.remove());
+    dom.body.innerHTML = elementHtml;
+    return dom.documentElement.outerHTML;
+}
+
+function captureElementForMarkdown(element, captureOptions = {}) {
+    if (!element || element.nodeType !== Node.ELEMENT_NODE) {
+        return null;
+    }
+
+    const clonedElement = cleanElementCloneForMarkdown(
+        element,
+        element.cloneNode(true),
+        captureOptions
+    );
+    const elementHtml = getElementHtmlForMarkdown(clonedElement);
+
+    if (!elementHtml || !elementHtml.trim()) {
+        return null;
+    }
+
+    return {
+        dom: buildDomWithManualElement(elementHtml, captureOptions),
+        elementHtml,
+        elementTitle: deriveElementPickerTitle(clonedElement),
+        elementLabel: getElementPickerLabel(element),
+        pageUrl: window.location.href,
+        documentTitle: document.title || '',
+        capturedAt: new Date().toISOString()
+    };
+}
+
 // This function must be called in a visible page, such as a browserAction popup
 // or a content script. Calling it in a background page has no effect!
 function copyToClipboard(text) {
@@ -1179,4 +1318,661 @@ function cleanupLinkPicker() {
     };
 
     console.log("Link picker mode deactivated");
+}
+
+// ===== Element Picker Feature =====
+
+if (typeof window.elementPickerState === 'undefined') {
+    window.elementPickerState = {
+        active: false,
+        hoveredElement: null,
+        selectedElement: null,
+        previousSelectedElement: null,
+        controlPanel: null,
+        hoverBox: null,
+        selectedBox: null,
+        tooltip: null,
+        styleElement: null,
+        handlers: {},
+        captureOptions: {},
+        accentColors: null,
+        converting: false
+    };
+}
+
+if (!window.elementPickerMessageListenerAdded) {
+    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.type === "ACTIVATE_ELEMENT_PICKER") {
+            return initElementPickerMode(message.captureOptions || {})
+                .then(() => ({ success: true }))
+                .catch((error) => {
+                    console.error("Failed to activate element picker:", error);
+                    return { success: false, error: String(error?.message || error) };
+                });
+        }
+    });
+    window.elementPickerMessageListenerAdded = true;
+}
+
+async function initElementPickerMode(captureOptions = {}) {
+    if (window.elementPickerState.active) {
+        return;
+    }
+
+    if (window.linkPickerState?.active && typeof cleanupLinkPicker === 'function') {
+        cleanupLinkPicker();
+    }
+
+    await markSnipI18nReady();
+
+    let accentColors = ACCENT_COLORS.sage;
+    try {
+        const data = await browser.storage.sync.get('popupAccent');
+        const accent = data.popupAccent || 'sage';
+        accentColors = ACCENT_COLORS[accent] || ACCENT_COLORS.sage;
+    } catch (error) {
+        accentColors = ACCENT_COLORS.sage;
+    }
+
+    window.elementPickerState = {
+        active: true,
+        hoveredElement: null,
+        selectedElement: null,
+        previousSelectedElement: null,
+        controlPanel: null,
+        hoverBox: null,
+        selectedBox: null,
+        tooltip: null,
+        styleElement: null,
+        handlers: {},
+        captureOptions: {
+            skipHiddenContent: captureOptions?.skipHiddenContent === true
+        },
+        accentColors,
+        converting: false
+    };
+
+    injectElementPickerStyles(accentColors);
+    createElementPickerChrome();
+    setupElementPickerEventListeners();
+    updateElementPickerPanel();
+}
+
+function injectElementPickerStyles(colors) {
+    const base = colors.base;
+    const dark = colors.dark;
+    const darker = colors.darker;
+    const hexToRgb = (hex) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `${r}, ${g}, ${b}`;
+    };
+    const baseRgb = hexToRgb(base);
+    const darkRgb = hexToRgb(dark);
+
+    const styles = `
+        .marksnip-element-picker-box {
+            position: fixed;
+            z-index: 1000000;
+            pointer-events: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateZ(0);
+            transition: opacity 140ms cubic-bezier(0.23, 1, 0.32, 1), border-color 140ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 140ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .marksnip-element-picker-hover-box {
+            border: 2px solid ${base};
+            background: rgba(${baseRgb}, 0.08);
+            box-shadow: 0 0 0 4px rgba(${baseRgb}, 0.16);
+        }
+
+        .marksnip-element-picker-selected-box {
+            border: 2px solid ${dark};
+            background: rgba(${darkRgb}, 0.1);
+            box-shadow: 0 0 0 5px rgba(${darkRgb}, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+        }
+
+        .marksnip-element-picker-box.is-visible {
+            opacity: 1;
+        }
+
+        .marksnip-element-picker-tooltip {
+            position: fixed;
+            z-index: 1000001;
+            pointer-events: none;
+            max-width: min(360px, calc(100vw - 32px));
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: #292524;
+            color: #FAFAF9;
+            font: 12px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 120ms cubic-bezier(0.23, 1, 0.32, 1), transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .marksnip-element-picker-tooltip.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .marksnip-element-picker-panel {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 1000002;
+            width: min(320px, calc(100vw - 32px));
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: linear-gradient(150deg, ${darker} 0%, ${dark} 100%);
+            color: #ffffff;
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34), 0 3px 12px rgba(0, 0, 0, 0.18);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            transform: translateZ(0) translateY(0);
+            animation: marksnipElementPickerIn 180ms cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+
+        .marksnip-element-picker-title {
+            margin: 0 0 4px;
+            font-size: 13px;
+            line-height: 1.3;
+            font-weight: 700;
+        }
+
+        .marksnip-element-picker-status {
+            min-height: 34px;
+            margin: 0 0 12px;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .marksnip-element-picker-target {
+            color: #ffffff;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            word-break: break-word;
+        }
+
+        .marksnip-element-picker-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .marksnip-element-picker-btn {
+            min-height: 34px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 8px 10px;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.12);
+            font: 600 12px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            cursor: pointer;
+            transition: background-color 140ms cubic-bezier(0.23, 1, 0.32, 1), color 140ms cubic-bezier(0.23, 1, 0.32, 1), transform 120ms cubic-bezier(0.23, 1, 0.32, 1), opacity 140ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .marksnip-element-picker-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .marksnip-element-picker-btn:active {
+            transform: scale(0.97);
+        }
+
+        .marksnip-element-picker-btn:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.86);
+            outline-offset: 2px;
+        }
+
+        .marksnip-element-picker-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+            transform: none;
+        }
+
+        .marksnip-element-picker-btn-primary {
+            background: rgba(255, 255, 255, 0.95);
+            color: ${darker};
+            border-color: rgba(255, 255, 255, 0.44);
+        }
+
+        .marksnip-element-picker-btn-primary:hover {
+            background: ${base};
+            color: #ffffff;
+        }
+
+        .marksnip-element-picker-success {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            z-index: 1000003;
+            max-width: min(420px, calc(100vw - 40px));
+            padding: 20px 24px;
+            border-radius: 14px;
+            background: linear-gradient(150deg, ${darker} 0%, ${dark} 100%);
+            color: #ffffff;
+            box-shadow: 0 18px 52px rgba(0, 0, 0, 0.36);
+            font: 600 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            text-align: center;
+            transform: translate(-50%, -50%) scale(0.96);
+            opacity: 0;
+            animation: marksnipElementPickerSuccess 180ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        @keyframes marksnipElementPickerIn {
+            from { opacity: 0; transform: translateZ(0) translateY(12px); }
+            to { opacity: 1; transform: translateZ(0) translateY(0); }
+        }
+
+        @keyframes marksnipElementPickerSuccess {
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .marksnip-element-picker-box,
+            .marksnip-element-picker-tooltip,
+            .marksnip-element-picker-panel,
+            .marksnip-element-picker-success,
+            .marksnip-element-picker-btn {
+                animation: none !important;
+                transition-duration: 0.01ms !important;
+                transform: none;
+            }
+
+            .marksnip-element-picker-success {
+                transform: translate(-50%, -50%);
+            }
+        }
+    `;
+
+    window.elementPickerState.styleElement = document.createElement('style');
+    window.elementPickerState.styleElement.textContent = styles;
+    window.elementPickerState.styleElement.setAttribute('data-marksnip-element-picker-ui', 'true');
+    document.head.appendChild(window.elementPickerState.styleElement);
+}
+
+function createElementPickerChrome() {
+    const hoverBox = document.createElement('div');
+    hoverBox.className = 'marksnip-element-picker-box marksnip-element-picker-hover-box';
+    hoverBox.setAttribute('data-marksnip-element-picker-ui', 'true');
+
+    const selectedBox = document.createElement('div');
+    selectedBox.className = 'marksnip-element-picker-box marksnip-element-picker-selected-box';
+    selectedBox.setAttribute('data-marksnip-element-picker-ui', 'true');
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'marksnip-element-picker-tooltip';
+    tooltip.setAttribute('data-marksnip-element-picker-ui', 'true');
+
+    const panel = document.createElement('div');
+    panel.className = 'marksnip-element-picker-panel';
+    panel.id = 'marksnip-element-picker-panel';
+    panel.setAttribute('data-marksnip-element-picker-ui', 'true');
+    panel.innerHTML = `
+        <p class="marksnip-element-picker-title"></p>
+        <p class="marksnip-element-picker-status" id="marksnip-element-picker-status"></p>
+        <div class="marksnip-element-picker-buttons">
+            <button class="marksnip-element-picker-btn" id="marksnip-element-picker-parent" type="button"></button>
+            <button class="marksnip-element-picker-btn" id="marksnip-element-picker-child" type="button"></button>
+            <button class="marksnip-element-picker-btn" id="marksnip-element-picker-reselect" type="button"></button>
+            <button class="marksnip-element-picker-btn" id="marksnip-element-picker-cancel" type="button"></button>
+            <button class="marksnip-element-picker-btn marksnip-element-picker-btn-primary" id="marksnip-element-picker-done" type="button"></button>
+        </div>
+    `;
+
+    panel.querySelector('.marksnip-element-picker-title').textContent = markSnipMessage('elementPickerTitle', null, 'Element Picker');
+    panel.querySelector('#marksnip-element-picker-parent').textContent = markSnipMessage('elementPickerParentBtn', null, 'Parent');
+    panel.querySelector('#marksnip-element-picker-child').textContent = markSnipMessage('elementPickerChildBtn', null, 'Child');
+    panel.querySelector('#marksnip-element-picker-reselect').textContent = markSnipMessage('elementPickerReselectBtn', null, 'Reselect');
+    panel.querySelector('#marksnip-element-picker-cancel').textContent = markSnipMessage('elementPickerCancelBtn', null, 'Cancel');
+    panel.querySelector('#marksnip-element-picker-done').textContent = markSnipMessage('elementPickerDoneBtn', null, 'Done');
+
+    document.body.appendChild(hoverBox);
+    document.body.appendChild(selectedBox);
+    document.body.appendChild(tooltip);
+    document.body.appendChild(panel);
+
+    window.elementPickerState.hoverBox = hoverBox;
+    window.elementPickerState.selectedBox = selectedBox;
+    window.elementPickerState.tooltip = tooltip;
+    window.elementPickerState.controlPanel = panel;
+
+    panel.querySelector('#marksnip-element-picker-parent').addEventListener('click', selectElementPickerParent);
+    panel.querySelector('#marksnip-element-picker-child').addEventListener('click', selectElementPickerChild);
+    panel.querySelector('#marksnip-element-picker-reselect').addEventListener('click', reselectElementPickerTarget);
+    panel.querySelector('#marksnip-element-picker-cancel').addEventListener('click', cancelElementPicker);
+    panel.querySelector('#marksnip-element-picker-done').addEventListener('click', finishElementPicker);
+}
+
+function setupElementPickerEventListeners() {
+    window.elementPickerState.handlers.mousemove = function(e) {
+        if (isElementPickerUi(e.target)) {
+            hideElementPickerHover();
+            return;
+        }
+
+        const element = getPickableElement(e.target);
+        if (!element) {
+            hideElementPickerHover();
+            return;
+        }
+
+        window.elementPickerState.hoveredElement = element;
+        updateElementPickerBox(window.elementPickerState.hoverBox, element);
+        updateElementPickerTooltip(element, e.clientX, e.clientY);
+    };
+
+    window.elementPickerState.handlers.click = function(e) {
+        if (isElementPickerUi(e.target)) {
+            return;
+        }
+
+        const element = getPickableElement(e.target);
+        if (!element) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+        selectElementPickerTarget(element);
+    };
+
+    window.elementPickerState.handlers.keydown = function(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelElementPicker();
+        } else if (e.key === 'Enter' && window.elementPickerState.selectedElement) {
+            e.preventDefault();
+            finishElementPicker();
+        }
+    };
+
+    window.elementPickerState.handlers.reposition = function() {
+        if (window.elementPickerState.hoveredElement) {
+            updateElementPickerBox(window.elementPickerState.hoverBox, window.elementPickerState.hoveredElement);
+        }
+        if (window.elementPickerState.selectedElement) {
+            updateElementPickerBox(window.elementPickerState.selectedBox, window.elementPickerState.selectedElement);
+        }
+    };
+
+    document.addEventListener('mousemove', window.elementPickerState.handlers.mousemove, true);
+    document.addEventListener('click', window.elementPickerState.handlers.click, true);
+    document.addEventListener('keydown', window.elementPickerState.handlers.keydown, true);
+    window.addEventListener('scroll', window.elementPickerState.handlers.reposition, true);
+    window.addEventListener('resize', window.elementPickerState.handlers.reposition, true);
+}
+
+function isElementPickerUi(element) {
+    return !!element?.closest?.('[data-marksnip-element-picker-ui="true"]');
+}
+
+function isPickableElement(element) {
+    if (!element || element.nodeType !== Node.ELEMENT_NODE) {
+        return false;
+    }
+    if (isElementPickerUi(element)) {
+        return false;
+    }
+    if (element === document.documentElement) {
+        return true;
+    }
+    return !!document.body?.contains(element);
+}
+
+function getPickableElement(element) {
+    let current = element;
+    while (current && current !== document) {
+        if (isPickableElement(current)) {
+            return current;
+        }
+        current = current.parentElement;
+    }
+    return null;
+}
+
+function updateElementPickerBox(box, element) {
+    if (!box || !element) {
+        return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const width = Math.max(1, rect.width);
+    const height = Math.max(1, rect.height);
+
+    box.style.left = `${Math.max(0, rect.left)}px`;
+    box.style.top = `${Math.max(0, rect.top)}px`;
+    box.style.width = `${width}px`;
+    box.style.height = `${height}px`;
+    box.classList.add('is-visible');
+}
+
+function hideElementPickerHover() {
+    window.elementPickerState.hoveredElement = null;
+    window.elementPickerState.hoverBox?.classList.remove('is-visible');
+    window.elementPickerState.tooltip?.classList.remove('is-visible');
+}
+
+function updateElementPickerTooltip(element, x, y) {
+    const tooltip = window.elementPickerState.tooltip;
+    if (!tooltip) {
+        return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const label = getElementPickerLabel(element) || markSnipMessage('elementPickerUnknownElement', null, 'element');
+    tooltip.textContent = `${label} - ${Math.round(rect.width)} x ${Math.round(rect.height)}`;
+
+    const margin = 12;
+    const left = Math.min(window.innerWidth - 24, x + margin);
+    const top = Math.min(window.innerHeight - 32, y + margin);
+    tooltip.style.left = `${Math.max(8, left)}px`;
+    tooltip.style.top = `${Math.max(8, top)}px`;
+    tooltip.classList.add('is-visible');
+}
+
+function getBestChildElement(element) {
+    const children = Array.from(element?.children || [])
+        .filter(child => !isElementPickerUi(child));
+
+    if (window.elementPickerState.hoveredElement &&
+        element.contains(window.elementPickerState.hoveredElement) &&
+        window.elementPickerState.hoveredElement !== element) {
+        return window.elementPickerState.hoveredElement;
+    }
+
+    let bestChild = null;
+    let bestArea = 0;
+    children.forEach(child => {
+        const rect = child.getBoundingClientRect();
+        const area = Math.max(0, rect.width) * Math.max(0, rect.height);
+        if (area > bestArea) {
+            bestArea = area;
+            bestChild = child;
+        }
+    });
+
+    return bestChild;
+}
+
+function selectElementPickerTarget(element) {
+    if (!isPickableElement(element)) {
+        return;
+    }
+
+    window.elementPickerState.previousSelectedElement = window.elementPickerState.selectedElement;
+    window.elementPickerState.selectedElement = element;
+    updateElementPickerBox(window.elementPickerState.selectedBox, element);
+    updateElementPickerPanel();
+}
+
+function selectElementPickerParent() {
+    const current = window.elementPickerState.selectedElement;
+    const parent = current?.parentElement;
+    if (parent && isPickableElement(parent)) {
+        selectElementPickerTarget(parent);
+    }
+}
+
+function selectElementPickerChild() {
+    const child = getBestChildElement(window.elementPickerState.selectedElement);
+    if (child && isPickableElement(child)) {
+        selectElementPickerTarget(child);
+    }
+}
+
+function reselectElementPickerTarget() {
+    window.elementPickerState.selectedElement = null;
+    window.elementPickerState.previousSelectedElement = null;
+    window.elementPickerState.selectedBox?.classList.remove('is-visible');
+    updateElementPickerPanel();
+}
+
+function updateElementPickerPanel() {
+    const selected = window.elementPickerState.selectedElement;
+    const panel = window.elementPickerState.controlPanel;
+    if (!panel) {
+        return;
+    }
+
+    const status = panel.querySelector('#marksnip-element-picker-status');
+    const parentButton = panel.querySelector('#marksnip-element-picker-parent');
+    const childButton = panel.querySelector('#marksnip-element-picker-child');
+    const reselectButton = panel.querySelector('#marksnip-element-picker-reselect');
+    const doneButton = panel.querySelector('#marksnip-element-picker-done');
+
+    if (selected) {
+        const label = getElementPickerLabel(selected);
+        status.innerHTML = '';
+        status.appendChild(document.createTextNode(markSnipMessage('elementPickerSelectedPrefix', null, 'Selected: ')));
+        const target = document.createElement('span');
+        target.className = 'marksnip-element-picker-target';
+        target.textContent = label || markSnipMessage('elementPickerUnknownElement', null, 'element');
+        status.appendChild(target);
+    } else {
+        status.textContent = markSnipMessage('elementPickerHoverInfo', null, 'Hover and click an element to convert it to Markdown.');
+    }
+
+    if (parentButton) {
+        parentButton.disabled = !selected?.parentElement || !isPickableElement(selected.parentElement);
+    }
+    if (childButton) {
+        childButton.disabled = !getBestChildElement(selected);
+    }
+    if (reselectButton) {
+        reselectButton.disabled = !selected;
+    }
+    if (doneButton) {
+        doneButton.disabled = !selected || window.elementPickerState.converting;
+    }
+}
+
+function setElementPickerStatus(text) {
+    const status = window.elementPickerState.controlPanel?.querySelector('#marksnip-element-picker-status');
+    if (status) {
+        status.textContent = text;
+    }
+}
+
+async function finishElementPicker() {
+    const selected = window.elementPickerState.selectedElement;
+    if (!selected || window.elementPickerState.converting) {
+        return;
+    }
+
+    window.elementPickerState.converting = true;
+    updateElementPickerPanel();
+    setElementPickerStatus(markSnipMessage('elementPickerConverting', null, 'Converting selected element...'));
+
+    try {
+        if (typeof marksnipPrepareForCapture === 'function') {
+            await marksnipPrepareForCapture();
+        }
+
+        const payload = captureElementForMarkdown(selected, window.elementPickerState.captureOptions);
+        if (!payload) {
+            throw new Error(markSnipMessage('elementPickerEmptyError', null, 'The selected element did not contain convertible content.'));
+        }
+
+        const result = await browser.runtime.sendMessage({
+            type: 'element-picker-convert',
+            payload
+        });
+
+        if (!result?.ok) {
+            throw new Error(result?.error || markSnipMessage('elementPickerFailedError', null, 'Element conversion failed.'));
+        }
+
+        const successMessage = result.action === 'copy'
+            ? markSnipMessage('elementPickerCopySuccess', null, 'Element Markdown copied to clipboard.')
+            : markSnipMessage('elementPickerSuccess', null, 'Element converted. Open MarkSnip to review.');
+        showElementPickerSuccess(successMessage);
+        setTimeout(() => cleanupElementPicker(), 1400);
+    } catch (error) {
+        console.error('Element picker conversion failed:', error);
+        window.elementPickerState.converting = false;
+        updateElementPickerPanel();
+        setElementPickerStatus(error?.message || markSnipMessage('elementPickerFailedError', null, 'Element conversion failed.'));
+    }
+}
+
+function showElementPickerSuccess(message) {
+    const notification = document.createElement('div');
+    notification.className = 'marksnip-element-picker-success';
+    notification.setAttribute('data-marksnip-element-picker-ui', 'true');
+    notification.textContent = message || markSnipMessage('elementPickerSuccess', null, 'Element converted. Open MarkSnip to review.');
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 2400);
+}
+
+function cancelElementPicker() {
+    cleanupElementPicker();
+}
+
+function cleanupElementPicker() {
+    const handlers = window.elementPickerState.handlers || {};
+    if (handlers.mousemove) {
+        document.removeEventListener('mousemove', handlers.mousemove, true);
+    }
+    if (handlers.click) {
+        document.removeEventListener('click', handlers.click, true);
+    }
+    if (handlers.keydown) {
+        document.removeEventListener('keydown', handlers.keydown, true);
+    }
+    if (handlers.reposition) {
+        window.removeEventListener('scroll', handlers.reposition, true);
+        window.removeEventListener('resize', handlers.reposition, true);
+    }
+
+    window.elementPickerState.hoverBox?.remove();
+    window.elementPickerState.selectedBox?.remove();
+    window.elementPickerState.tooltip?.remove();
+    window.elementPickerState.controlPanel?.remove();
+    window.elementPickerState.styleElement?.remove();
+
+    window.elementPickerState = {
+        active: false,
+        hoveredElement: null,
+        selectedElement: null,
+        previousSelectedElement: null,
+        controlPanel: null,
+        hoverBox: null,
+        selectedBox: null,
+        tooltip: null,
+        styleElement: null,
+        handlers: {},
+        captureOptions: {},
+        accentColors: null,
+        converting: false
+    };
 }

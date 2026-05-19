@@ -159,6 +159,8 @@ function handleMessages(message, sender) {
 	    case 'process-content':
 	      await processContent(message);
 	      break;
+    case 'process-element-content':
+      return await processElementContent(message);
     case 'download-markdown':
       await downloadMarkdown(
         message.markdown,
@@ -248,6 +250,92 @@ async function processContent(message) {
       type: 'process-error',
       error: error.message
     });
+  }
+}
+
+function buildArticleFromSelectedElement(data = {}, options = defaultOptions) {
+  const domString = data.dom || '';
+  if (!domString) {
+    throw new Error('Missing selected element DOM');
+  }
+
+  const parser = new DOMParser();
+  const dom = parser.parseFromString(domString, 'text/html');
+  if (dom.documentElement.nodeName === 'parsererror' || !dom.body) {
+    throw new Error('Unable to parse selected element DOM');
+  }
+
+  const selectedTitle = String(
+    data.elementTitle ||
+    data.documentTitle ||
+    'Selected Element'
+  ).trim() || 'Selected Element';
+  const recoveryApi = getReadabilityRecoveryApi();
+  const prepared = prepareDomForReadability(dom, options, recoveryApi);
+  prepared.dom.title = selectedTitle;
+  const content = prepared.dom.body?.innerHTML || '';
+  if (!content.trim()) {
+    throw new Error('Selected element did not contain convertible HTML');
+  }
+
+  const textContent = normalizeMeaningfulText(prepared.dom.body?.textContent || '');
+
+  const article = {
+    title: selectedTitle,
+    content,
+    textContent,
+    length: textContent.length,
+    excerpt: textContent.substring(0, 200),
+    byline: '',
+    dir: prepared.dom.dir || '',
+    siteName: '',
+    lang: prepared.dom.documentElement?.lang || ''
+  };
+
+  const finalizedArticle = finalizeArticleMetadata(
+    article,
+    prepared.dom,
+    data.pageUrl,
+    prepared.math,
+    recoveryApi,
+    options,
+    prepared.dom
+  );
+
+  finalizedArticle.manualElement = true;
+  finalizedArticle.manualElementLabel = data.elementLabel || '';
+  return finalizedArticle;
+}
+
+async function processElementContent(message) {
+  try {
+    const { data, options } = message;
+    const article = buildArticleFromSelectedElement(data, options || defaultOptions);
+    const resolved = resolveOptionsForArticle(article, options || defaultOptions);
+
+    const { markdown, imageList, sourceImageMap } = await convertArticleToMarkdown(article, null, resolved.options);
+    article.title = await formatTitle(article, resolved.options);
+    const mdClipsFolder = await formatMdClipsFolder(article, resolved.options);
+
+    return {
+      ok: true,
+      result: {
+        markdown,
+        article,
+        imageList,
+        sourceImageMap,
+        mdClipsFolder,
+        effectiveOptions: resolved.options,
+        matchedSiteRule: resolved.matchedRule,
+        overriddenKeys: resolved.overriddenKeys
+      }
+    };
+  } catch (error) {
+    console.error('Error processing selected element:', error);
+    return {
+      ok: false,
+      error: error.message
+    };
   }
 }
 

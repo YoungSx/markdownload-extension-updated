@@ -71,6 +71,10 @@
     "message": "Download Selection As Markdown",
     "description": "Context menu item"
   },
+  "contextPickElement": {
+    "message": "Pick Element for Markdown",
+    "description": "Context menu item for activating manual element picker mode"
+  },
   "contextCopySelection": {
     "message": "Copy Selection As Markdown",
     "description": "Context menu item"
@@ -222,6 +226,22 @@
   "popupDownloadBtn": {
     "message": "Download",
     "description": "Button label"
+  },
+  "popupPickElementBtn": {
+    "message": "Pick Element",
+    "description": "Button label for activating manual element picker mode"
+  },
+  "popupPickElementStarting": {
+    "message": "Pick on page...",
+    "description": "Temporary popup feedback after activating element picker mode"
+  },
+  "popupPickElementFailed": {
+    "message": "Picker failed",
+    "description": "Temporary popup feedback when element picker activation fails"
+  },
+  "popupAlertFailedToActivateElementPicker": {
+    "message": "Failed to activate element picker. Please try again.",
+    "description": "Alert shown when element picker mode cannot be activated"
   },
   "popupExportArrowTitle": {
     "message": "More export options",
@@ -1948,7 +1968,7 @@
     "description": "Subheading for Context Menus"
   },
   "guideSettingsDownloadsMenusDesc": {
-    "message": "Toggles the right-click context menu items on and off. Default: <strong>On</strong>.",
+    "message": "Toggles the right-click context menu items on and off. Use <strong>Visible Menu Items</strong> to choose the individual MarkSnip actions that are allowed to appear. Browsers only show items that apply to where you right-click, such as page, selection, link, image, or tab menus. Default: <strong>On</strong>, with all menu items visible.",
     "description": "Description for Context Menus"
   },
   "guideSettingsDownloadsAction": {
@@ -3316,6 +3336,62 @@
   "popupUntitledFallback": {
     "message": "Untitled",
     "description": "Fallback title for untitled clips"
+  },
+  "elementPickerTitle": {
+    "message": "Element Picker",
+    "description": "Title for in-page element picker overlay"
+  },
+  "elementPickerHoverInfo": {
+    "message": "Hover and click an element to convert it to Markdown.",
+    "description": "Instruction text for element picker overlay"
+  },
+  "elementPickerSelectedPrefix": {
+    "message": "Selected: ",
+    "description": "Prefix before selected element label in element picker overlay"
+  },
+  "elementPickerParentBtn": {
+    "message": "Parent",
+    "description": "Element picker button for selecting parent element"
+  },
+  "elementPickerChildBtn": {
+    "message": "Child",
+    "description": "Element picker button for selecting child element"
+  },
+  "elementPickerReselectBtn": {
+    "message": "Reselect",
+    "description": "Element picker button for clearing current selection"
+  },
+  "elementPickerCancelBtn": {
+    "message": "Cancel",
+    "description": "Element picker cancel button"
+  },
+  "elementPickerDoneBtn": {
+    "message": "Done",
+    "description": "Element picker done button"
+  },
+  "elementPickerUnknownElement": {
+    "message": "element",
+    "description": "Fallback element label for element picker"
+  },
+  "elementPickerConverting": {
+    "message": "Converting selected element...",
+    "description": "Element picker status while conversion is running"
+  },
+  "elementPickerEmptyError": {
+    "message": "The selected element did not contain convertible content.",
+    "description": "Element picker error when selected element has no content"
+  },
+  "elementPickerFailedError": {
+    "message": "Element conversion failed.",
+    "description": "Element picker generic conversion error"
+  },
+  "elementPickerSuccess": {
+    "message": "Element converted. Open MarkSnip to review.",
+    "description": "Element picker success notification"
+  },
+  "elementPickerCopySuccess": {
+    "message": "Element Markdown copied to clipboard.",
+    "description": "Element picker success notification when Done copies Markdown directly"
   },
   "linkPickerTitle": {
     "message": "Link Picker",

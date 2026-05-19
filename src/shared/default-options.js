@@ -1,3 +1,21 @@
+const DEFAULT_CONTEXT_MENU_ITEMS = {
+  downloadTab: true,
+  downloadAllTabs: true,
+  downloadSelection: true,
+  pickElement: true,
+  copySelection: true,
+  copyLink: true,
+  copyImage: true,
+  copyTab: true,
+  copyTabLink: true,
+  copyAllTabLinks: true,
+  copySelectedTabLinks: true,
+  sendSelectionToObsidian: true,
+  sendTabToObsidian: true,
+  toggleIncludeTemplate: true,
+  toggleDownloadImages: true
+}
+
 // these are the default options
 const defaultOptions = {
   headingStyle: "atx",
@@ -44,6 +62,7 @@ const defaultOptions = {
   turndownEscape: true,
   hashtagHandling: 'keep',
   contextMenus: true,
+  contextMenuItems: DEFAULT_CONTEXT_MENU_ITEMS,
   batchProcessingEnabled: true,
   obsidianIntegration: false,
   obsidianVault: "",
@@ -54,6 +73,8 @@ const defaultOptions = {
   specialThemeIcon: true,
   popupAccent: 'sage',
   compactMode: false,
+  elementPickerEnabled: true,
+  elementPickerDoneAction: 'popup',
   showThemeToggleInPopup: true,
   showUserGuideIcon: true,
   editorTheme: 'default',
@@ -79,6 +100,18 @@ function getSiteRulesApi() {
   return null;
 }
 
+function normalizeContextMenuItems(contextMenuItems) {
+  const source = contextMenuItems && Object.prototype.toString.call(contextMenuItems) === '[object Object]'
+    ? contextMenuItems
+    : {};
+  return Object.keys(DEFAULT_CONTEXT_MENU_ITEMS).reduce((normalized, key) => {
+    normalized[key] = Object.prototype.hasOwnProperty.call(source, key)
+      ? source[key] !== false
+      : DEFAULT_CONTEXT_MENU_ITEMS[key] !== false;
+    return normalized;
+  }, {});
+}
+
 // function to get the options from storage and substitute default options if it fails
 async function getOptions() {
   let options = defaultOptions;
@@ -90,6 +123,7 @@ async function getOptions() {
   if (options.frontmatter === LEGACY_DEFAULT_FRONTMATTER) {
     options.frontmatter = defaultOptions.frontmatter;
   }
+  options.contextMenuItems = normalizeContextMenuItems(options.contextMenuItems);
   const siteRulesApi = getSiteRulesApi();
   if (siteRulesApi?.normalizeSiteRules) {
     options.siteRules = siteRulesApi.normalizeSiteRules(options.siteRules);
@@ -106,8 +140,10 @@ if (typeof globalThis !== 'undefined') {
 
 if (typeof module === 'object' && module.exports) {
   module.exports = {
+    DEFAULT_CONTEXT_MENU_ITEMS,
     defaultOptions,
     LEGACY_DEFAULT_FRONTMATTER,
-    getOptions
+    getOptions,
+    normalizeContextMenuItems
   };
 }

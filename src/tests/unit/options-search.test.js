@@ -79,6 +79,7 @@ const baseOptions = {
   turndownEscape: true,
   hashtagHandling: 'keep',
   contextMenus: true,
+  contextMenuItems: sharedDefaultOptions.contextMenuItems,
   batchProcessingEnabled: true,
   obsidianIntegration: false,
   obsidianVault: '',
@@ -89,6 +90,8 @@ const baseOptions = {
   specialThemeIcon: true,
   popupAccent: 'sage',
   compactMode: false,
+  elementPickerEnabled: true,
+  elementPickerDoneAction: 'popup',
   showUserGuideIcon: true,
   editorTheme: 'default',
   uiLanguage: 'auto',
@@ -282,6 +285,7 @@ describe('Options search helper', () => {
 
     expect(search.stage).toBe('fallback');
     expect(search.matches.map(result => result.card.id)).toEqual([
+      'contextMenus-container',
       'downloadMode',
       'downloadImages-container'
     ]);
@@ -313,6 +317,9 @@ describe('Options search helper', () => {
     expect(getMatchIds(index, 'shortcut')).toContain('linkReferenceStyle');
     expect(getMatchIds(index, 'hashtag')).toContain('hashtagHandling-container');
     expect(getMatchIds(index, 'batch processing')).toContain('batchProcessingEnabled-container');
+    expect(getMatchIds(index, 'element picker')).toContain('elementPickerGroup');
+    expect(getMatchIds(index, 'manual extraction')).toContain('elementPickerGroup');
+    expect(getMatchIds(index, 'copy picked element')).toContain('elementPickerGroup');
     expect(getMatchIds(index, 'obsidian vault')).toContain('obsidianVault');
     expect(getMatchIds(index, 'download images')).toContain('downloadImages-container');
     expect(getMatchIds(index, 'guide icon')).toContain('popupBehaviorGroup');
@@ -708,6 +715,51 @@ describe('Options page search UI', () => {
     }));
   });
 
+  test('restores and saves individual context menu item visibility', async () => {
+    const { dom, browser } = createOptionsPageDom({
+      contextMenuItems: {
+        ...sharedDefaultOptions.contextMenuItems,
+        copyImage: false
+      }
+    });
+    const { document } = dom.window;
+
+    document.dispatchEvent(new dom.window.Event('DOMContentLoaded', { bubbles: true }));
+    await waitForMicrotasks();
+    await waitFor(dom.window, 50);
+
+    expect(document.getElementById('contextMenuItem-copyImage').checked).toBe(false);
+    expect(document.getElementById('contextMenuItem-copyLink').checked).toBe(true);
+
+    const copyLink = document.getElementById('contextMenuItem-copyLink');
+    copyLink.checked = false;
+    copyLink.dispatchEvent(new dom.window.Event('change', { bubbles: true }));
+    await waitForMicrotasks();
+
+    expect(browser.storage.sync.set).toHaveBeenCalledWith(expect.objectContaining({
+      contextMenuItems: expect.objectContaining({
+        copyImage: false,
+        copyLink: false
+      })
+    }));
+  });
+
+  test('context menu item bulk buttons save all item preferences', async () => {
+    const { dom, browser } = createOptionsPageDom();
+    const { document } = dom.window;
+
+    document.dispatchEvent(new dom.window.Event('DOMContentLoaded', { bubbles: true }));
+    await waitForMicrotasks();
+    await waitFor(dom.window, 50);
+
+    document.getElementById('contextMenuItemsDisableAll').click();
+    await flushPendingPromises();
+
+    const lastCall = browser.storage.sync.set.mock.calls[browser.storage.sync.set.mock.calls.length - 1][0];
+    expect(Object.values(lastCall.contextMenuItems).every(value => value === false)).toBe(true);
+    expect(document.getElementById('contextMenuItem-copyTabLink').checked).toBe(false);
+  });
+
   test('ignores controls with empty option keys in the generic autosave listener', async () => {
     const { dom, browser } = createOptionsPageDom();
     const { document } = dom.window;
@@ -744,6 +796,43 @@ describe('Options page search UI', () => {
 
     expect(browser.storage.sync.set).toHaveBeenCalledWith(expect.objectContaining({
       showUserGuideIcon: true
+    }));
+  });
+
+  test('restores and saves the element picker toggle', async () => {
+    const { dom, browser } = createOptionsPageDom({ elementPickerEnabled: false });
+    const { document } = dom.window;
+
+    document.dispatchEvent(new dom.window.Event('DOMContentLoaded', { bubbles: true }));
+    await flushPendingPromises();
+
+    const toggle = document.getElementById('elementPickerEnabled');
+    expect(toggle.checked).toBe(false);
+
+    toggle.checked = true;
+    toggle.dispatchEvent(new dom.window.Event('change', { bubbles: true }));
+    await waitForMicrotasks();
+
+    expect(browser.storage.sync.set).toHaveBeenCalledWith(expect.objectContaining({
+      elementPickerEnabled: true
+    }));
+  });
+
+  test('restores and saves the element picker done action', async () => {
+    const { dom, browser } = createOptionsPageDom({ elementPickerDoneAction: 'copy' });
+    const { document } = dom.window;
+
+    document.dispatchEvent(new dom.window.Event('DOMContentLoaded', { bubbles: true }));
+    await flushPendingPromises();
+
+    expect(document.getElementById('element-picker-action-copy').checked).toBe(true);
+
+    document.getElementById('element-picker-action-popup').checked = true;
+    document.getElementById('element-picker-action-popup').dispatchEvent(new dom.window.Event('change', { bubbles: true }));
+    await waitForMicrotasks();
+
+    expect(browser.storage.sync.set).toHaveBeenCalledWith(expect.objectContaining({
+      elementPickerDoneAction: 'popup'
     }));
   });
 

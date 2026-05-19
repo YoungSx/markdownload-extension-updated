@@ -144,8 +144,59 @@ test.describe('MarkSnip Extension E2E', () => {
     try {
       await popupPage.goto(`chrome-extension://${extensionId}/popup/popup.html`);
       await expect(popupPage.locator('#container')).toBeVisible();
+      await expect(popupPage.locator('#pickElement')).toBeVisible();
+
+      const pickerBox = await popupPage.locator('#pickElement').boundingBox();
+      const bodyWidth = await popupPage.evaluate(() => document.body.getBoundingClientRect().width);
+      expect(pickerBox.x + pickerBox.width).toBeLessThanOrEqual(bodyWidth + 1);
     } finally {
       await popupPage.close().catch(() => {});
+    }
+  });
+
+  test('popup hides element picker when disabled in options', async () => {
+    const popupPage = await context.newPage();
+    try {
+      await setSyncStorage(serviceWorker, { elementPickerEnabled: false });
+
+      await popupPage.goto(`chrome-extension://${extensionId}/popup/popup.html`);
+      await expect(popupPage.locator('#container')).toBeVisible();
+      await expect(popupPage.locator('#elementPickerRow')).toBeHidden();
+    } finally {
+      await setSyncStorage(serviceWorker, { elementPickerEnabled: true });
+      await popupPage.close().catch(() => {});
+    }
+  });
+
+  test('context menu activates element picker mode', async () => {
+    const fixturePage = await context.newPage();
+
+    try {
+      await setSyncStorage(serviceWorker, { elementPickerEnabled: true });
+      await fixturePage.goto(`${fixtureHost}/extension/deterministic-article.html`);
+      await fixturePage.waitForLoadState('networkidle');
+      await fixturePage.bringToFront();
+
+      const fixtureTabId = await serviceWorker.evaluate(async ({ targetUrl }) => {
+        const tabs = await browser.tabs.query({});
+        return tabs.find((tab) => tab.url === targetUrl)?.id || null;
+      }, { targetUrl: fixturePage.url() });
+      expect(fixtureTabId).toBeTruthy();
+
+      await serviceWorker.evaluate(async ({ tabId, tabUrl }) => {
+        await handleContextMenuClick({
+          menuItemId: 'pick-element-markdown'
+        }, {
+          id: tabId,
+          url: tabUrl
+        });
+      }, { tabId: fixtureTabId, tabUrl: fixturePage.url() });
+
+      await expect(fixturePage.locator('#marksnip-element-picker-panel')).toBeVisible();
+      await expect(fixturePage.locator('#marksnip-element-picker-status')).toContainText('Hover and click');
+    } finally {
+      await fixturePage.keyboard.press('Escape').catch(() => {});
+      await fixturePage.close().catch(() => {});
     }
   });
 
@@ -205,6 +256,136 @@ test.describe('MarkSnip Extension E2E', () => {
       await serviceWorker.evaluate(async () => {
         await browser.storage.sync.set({ uiLanguage: 'auto' });
         await self.markSnipI18n?.setUiLanguage?.('auto');
+      }).catch(() => {});
+      await fixturePage.close().catch(() => {});
+    }
+  });
+
+  test('element picker converts a confirmed element into popup markdown', async () => {
+    const fixturePage = await context.newPage();
+    const popupPage = await context.newPage();
+
+    try {
+      await serviceWorker.evaluate(async () => {
+        await browser.storage.local.remove('elementPickerResult');
+      });
+
+      await fixturePage.goto(`${fixtureHost}/extension/deterministic-article.html`);
+      await fixturePage.waitForLoadState('networkidle');
+      await fixturePage.bringToFront();
+
+      const fixtureTabId = await serviceWorker.evaluate(async ({ targetUrl }) => {
+        const tabs = await browser.tabs.query({});
+        return tabs.find((tab) => tab.url === targetUrl)?.id || null;
+      }, { targetUrl: fixturePage.url() });
+      expect(fixtureTabId).toBeTruthy();
+
+      await serviceWorker.evaluate(async ({ tabId }) => {
+        await browser.scripting.executeScript({
+          target: { tabId },
+          files: ['/browser-polyfill.min.js', '/shared/i18n.js', '/contentScript/contentScript.js']
+        });
+        await browser.tabs.sendMessage(tabId, {
+          type: 'ACTIVATE_ELEMENT_PICKER',
+          captureOptions: { skipHiddenContent: false }
+        });
+      }, { tabId: fixtureTabId });
+
+      await expect(fixturePage.locator('#marksnip-element-picker-panel')).toBeVisible();
+      await fixturePage.locator('#manual-element-fixture h2').click();
+      await fixturePage.locator('#marksnip-element-picker-parent').click();
+      await expect(fixturePage.locator('#marksnip-element-picker-status')).toContainText('aside#manual-element-fixture');
+      await fixturePage.locator('#marksnip-element-picker-done').click();
+
+      await expect.poll(async () => {
+        return await serviceWorker.evaluate(async () => {
+          const state = await browser.storage.local.get('elementPickerResult');
+          return state.elementPickerResult?.markdown || '';
+        });
+      }, { timeout: 45000 }).toContain('Manual Element Fixture');
+
+      await popupPage.goto(`chrome-extension://${extensionId}/popup/popup.html`);
+      await expect(popupPage.locator('#container')).toBeVisible();
+      await popupPage.evaluate(async ({ tabId, tabUrl }) => {
+        await consumePendingElementPickerResult({ id: tabId, url: tabUrl });
+      }, { tabId: fixtureTabId, tabUrl: fixturePage.url() });
+
+      await expect.poll(async () => {
+        return await popupPage.evaluate(() => {
+          if (typeof cm !== 'undefined' && cm?.getValue) {
+            return cm.getValue();
+          }
+          return document.getElementById('md')?.value || '';
+        });
+      }, { timeout: 15000 }).toContain('Manual Element Fixture');
+
+      const markdown = await popupPage.evaluate(() => {
+        if (typeof cm !== 'undefined' && cm?.getValue) {
+          return cm.getValue();
+        }
+        return document.getElementById('md')?.value || '';
+      });
+
+      expect(markdown).toContain('This paragraph is used to verify manual element picker conversion.');
+      expect(markdown).toContain('[Manual target link]');
+      expect(markdown).not.toContain('This page is routed by Playwright for deterministic extension E2E tests.');
+    } finally {
+      await serviceWorker.evaluate(async () => {
+        await browser.storage.local.remove('elementPickerResult');
+      }).catch(() => {});
+      await popupPage.close().catch(() => {});
+      await fixturePage.close().catch(() => {});
+    }
+  });
+
+  test('element picker copies markdown immediately when configured', async () => {
+    const fixturePage = await context.newPage();
+
+    try {
+      await setSyncStorage(serviceWorker, {
+        elementPickerEnabled: true,
+        elementPickerDoneAction: 'copy'
+      });
+      await serviceWorker.evaluate(async () => {
+        await browser.storage.local.remove('elementPickerResult');
+      });
+
+      await fixturePage.goto(`${fixtureHost}/extension/deterministic-article.html`);
+      await fixturePage.waitForLoadState('networkidle');
+      await fixturePage.bringToFront();
+
+      const fixtureTabId = await serviceWorker.evaluate(async ({ targetUrl }) => {
+        const tabs = await browser.tabs.query({});
+        return tabs.find((tab) => tab.url === targetUrl)?.id || null;
+      }, { targetUrl: fixturePage.url() });
+      expect(fixtureTabId).toBeTruthy();
+
+      await serviceWorker.evaluate(async ({ tabId }) => {
+        await browser.scripting.executeScript({
+          target: { tabId },
+          files: ['/browser-polyfill.min.js', '/shared/i18n.js', '/contentScript/contentScript.js']
+        });
+        await browser.tabs.sendMessage(tabId, {
+          type: 'ACTIVATE_ELEMENT_PICKER',
+          captureOptions: { skipHiddenContent: false }
+        });
+      }, { tabId: fixtureTabId });
+
+      await expect(fixturePage.locator('#marksnip-element-picker-panel')).toBeVisible();
+      await fixturePage.locator('#manual-element-fixture h2').click();
+      await fixturePage.locator('#marksnip-element-picker-parent').click();
+      await fixturePage.locator('#marksnip-element-picker-done').click();
+      await expect(fixturePage.locator('.marksnip-element-picker-success')).toContainText('Element Markdown copied to clipboard.');
+
+      const storedResult = await serviceWorker.evaluate(async () => {
+        const state = await browser.storage.local.get('elementPickerResult');
+        return state.elementPickerResult || null;
+      });
+      expect(storedResult).toBeNull();
+    } finally {
+      await setSyncStorage(serviceWorker, { elementPickerDoneAction: 'popup' }).catch(() => {});
+      await serviceWorker.evaluate(async () => {
+        await browser.storage.local.remove('elementPickerResult');
       }).catch(() => {});
       await fixturePage.close().catch(() => {});
     }

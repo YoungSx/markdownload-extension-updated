@@ -76,6 +76,8 @@ const SINGLE_DOWNLOAD_NOTIFICATION_DELTA = Object.freeze({ downloads: 1, exports
 const BATCH_DOWNLOAD_NOTIFICATION_DELTA = Object.freeze({ downloads: 1, exports: 0 });
 const NO_EXPORT_DOWNLOAD_NOTIFICATION_DELTA = Object.freeze({ downloads: 0, exports: 0 });
 const PENDING_NOTIFICATION_DISPLAY_LOCK_TIMEOUT_MS = 5000;
+const ELEMENT_PICKER_RESULT_STORAGE_KEY = 'elementPickerResult';
+const ELEMENT_PICKER_DONE_ACTIONS = new Set(['popup', 'copy']);
 let releaseHighlightsCachePromise = null;
 let notificationStateTaskChain = Promise.resolve();
 const pendingNotificationDisplayLocks = new Map();
@@ -847,6 +849,8 @@ async function handleMessages(message, sender, _sendResponse) {
     case "clip":
       await handleClipRequest(message, sender.tab?.id);
       break;
+    case "element-picker-convert":
+      return await handleElementPickerConvert(message, sender);
     case "download":
       await handleDownloadRequest(message);
       break;
@@ -2014,6 +2018,91 @@ async function handleClipRequest(message, tabId) {
   }
 }
 
+async function handleElementPickerConvert(message, sender) {
+  const payload = message?.payload || null;
+  const tabId = Number.isInteger(sender?.tab?.id)
+    ? sender.tab.id
+    : Number.isInteger(message?.tabId)
+      ? message.tabId
+      : null;
+
+  if (!payload?.dom) {
+    return {
+      ok: false,
+      error: 'Missing selected element content'
+    };
+  }
+
+  try {
+    await ensureOffscreenDocumentExists({ allowFirefoxTab: true });
+    const options = await getOptions();
+    const response = await browser.runtime.sendMessage({
+      target: 'offscreen',
+      type: 'process-element-content',
+      data: payload,
+      tabId,
+      options
+    });
+
+    if (!response?.ok) {
+      return {
+        ok: false,
+        error: response?.error || 'Element conversion failed'
+      };
+    }
+
+    const doneAction = ELEMENT_PICKER_DONE_ACTIONS.has(options.elementPickerDoneAction)
+      ? options.elementPickerDoneAction
+      : 'popup';
+
+    if (doneAction === 'copy') {
+      const copied = await browser.runtime.sendMessage({
+        target: 'offscreen',
+        type: 'copy-to-clipboard',
+        text: response.result.markdown,
+        options: response.result.effectiveOptions || options
+      });
+
+      if (!copied) {
+        return {
+          ok: false,
+          error: 'Failed to copy selected element Markdown to clipboard'
+        };
+      }
+
+      if (Number.isInteger(tabId)) {
+        await recordNotificationMetricsSafely({ copies: 1, exports: 0 }, { tabId });
+      }
+
+      return {
+        ok: true,
+        action: 'copy'
+      };
+    }
+
+    await browser.storage.local.set({
+      [ELEMENT_PICKER_RESULT_STORAGE_KEY]: {
+        ...response.result,
+        tabId,
+        pageUrl: payload.pageUrl || '',
+        source: 'element-picker',
+        capturedAt: Date.now()
+      }
+    });
+
+    return {
+      ok: true,
+      action: 'popup'
+    };
+  } catch (error) {
+    console.error('[Element Picker] Failed to convert selected element:', error);
+    return {
+      ok: false,
+      error: error.message
+    };
+  }
+}
+
 /**
  * Generate unique request ID
  */
@@ -2151,6 +2240,10 @@ async function handleContextMenuClick(info, tab) {
   else if (info.menuItemId.startsWith("download-markdown")) {
     await downloadMarkdownFromContext(info, tab);
   }
+  // Activate manual element picker
+  else if (info.menuItemId === "pick-element-markdown") {
+    await activateElementPickerFromContext(info, tab);
+  }
   // Copy all tabs as markdown links
   else if (info.menuItemId === "copy-tab-as-markdown-link-all") {
     await copyTabAsMarkdownLinkAll(tab);
@@ -2167,6 +2260,43 @@ async function handleContextMenuClick(info, tab) {
   else if (info.menuItemId.startsWith("toggle-") || info.menuItemId.startsWith("tabtoggle-")) {
     await toggleSetting(info.menuItemId.split('-')[1]);
   }
+}
+
+async function activateElementPickerFromContext(info, tab) {
+  const targetTab = tab?.id != null ? tab : await getCommandTargetTab();
+  if (!targetTab?.id) {
+    throw new Error('No active tab found');
+  }
+
+  if (isRestrictedTabUrl(targetTab.url || '')) {
+    console.warn('[Element Picker] Cannot activate on restricted page:', targetTab.url);
+    return { ok: false, error: 'Element picker cannot run on this page' };
+  }
+
+  const options = await getOptions();
+  if (options.elementPickerEnabled === false) {
+    return { ok: false, error: 'Element picker is disabled' };
+  }
+
+  await browser.scripting.executeScript({
+    target: { tabId: targetTab.id },
+    files: ["/browser-polyfill.min.js", "/shared/i18n.js", "/contentScript/contentScript.js"]
+  }).catch((error) => {
+    console.log("Content script may already be injected:", error);
+  });
+
+  const response = await browser.tabs.sendMessage(targetTab.id, {
+    type: "ACTIVATE_ELEMENT_PICKER",
+    captureOptions: {
+      skipHiddenContent: options.skipHiddenContent === true
+    }
+  });
+  if (response?.success === false) {
+    throw new Error(response.error || 'Failed to activate element picker');
+  }
+
+  await browser.tabs.update(targetTab.id, { active: true }).catch(() => {});
+  return { ok: true };
 }
 
 async function getCommandTargetTab() {

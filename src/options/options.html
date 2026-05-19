@@ -650,6 +650,39 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="setting-card" id="elementPickerGroup"
+                    data-search-keywords="manual extraction,pick element,element picker,inspector,clipboard,copy picked element,manual markdown"
+                    data-setting-key="elementPickerEnabled,elementPickerDoneAction">
+                    <h3 class="card-title">Element Picker</h3>
+                    <p class="card-desc">Configure manual element extraction from the popup and context menu.</p>
+                    <div id="elementPickerEnabled-container">
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <label class="toggle-label-text" for="elementPickerEnabled">Enable Element Picker</label>
+                                <p class="toggle-hint">Shows the Pick Element control for manual extraction from the current page.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input name="elementPickerEnabled" id="elementPickerEnabled" type="checkbox" />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="elementPickerDoneAction-container">
+                        <label class="input-label">After picking an element</label>
+                        <p class="toggle-hint">Choose what happens when you press Done in the manual element picker.</p>
+                        <div class="radio-group">
+                            <div class="radio-pill">
+                                <input type="radio" name="elementPickerDoneAction" id="element-picker-action-popup" value="popup" />
+                                <label for="element-picker-action-popup">Review in popup</label>
+                            </div>
+                            <div class="radio-pill">
+                                <input type="radio" name="elementPickerDoneAction" id="element-picker-action-copy" value="copy" />
+                                <label for="element-picker-action-copy">Copy to clipboard</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -661,7 +694,9 @@
                 <p class="section-desc">Configure how files are exported and manage integrations with Obsidian, assistants, and the Agent Bridge.</p>
 
                 <!-- Context Menus -->
-                <div class="setting-card" id="contextMenus-container" data-setting-key="contextMenus">
+                <div class="setting-card" id="contextMenus-container"
+                    data-setting-key="contextMenus,contextMenuItems"
+                    data-search-keywords="right click menu items show hide visible context menu customize disable enable">
                     <div class="toggle-row">
                         <div class="toggle-info">
                             <label class="toggle-label-text" for="contextMenus">Enable Context Menus</label>
@@ -671,6 +706,95 @@
                             <input name="contextMenus" id="contextMenus" type="checkbox" />
                             <span class="toggle-slider"></span>
                         </label>
+                    </div>
+                    <div class="context-menu-items-panel">
+                        <div class="context-menu-items-header">
+                            <div>
+                                <div class="input-label">Visible Menu Items</div>
+                                <p class="toggle-hint">Choose which MarkSnip actions are allowed to appear. Browsers only show items that match where you right-click, such as page, selection, link, image, or tab menus.</p>
+                            </div>
+                            <div class="btn-group context-menu-items-actions">
+                                <button id="contextMenuItemsEnableAll" class="btn btn-secondary" type="button">Enable All</button>
+                                <button id="contextMenuItemsDisableAll" class="btn btn-secondary" type="button">Disable All</button>
+                            </div>
+                        </div>
+                        <div class="context-menu-items-grid" role="group" aria-label="Visible context menu items">
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-downloadTab">
+                                <input name="contextMenuItems.downloadTab" id="contextMenuItem-downloadTab" type="checkbox" />
+                                <span>Download tab as Markdown</span>
+                                <small class="context-menu-item-scope">Page/tab</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-downloadAllTabs">
+                                <input name="contextMenuItems.downloadAllTabs" id="contextMenuItem-downloadAllTabs" type="checkbox" />
+                                <span>Download all tabs as Markdown</span>
+                                <small class="context-menu-item-scope">Page/tab</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-downloadSelection">
+                                <input name="contextMenuItems.downloadSelection" id="contextMenuItem-downloadSelection" type="checkbox" />
+                                <span>Download selection as Markdown</span>
+                                <small class="context-menu-item-scope">Selection</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-pickElement">
+                                <input name="contextMenuItems.pickElement" id="contextMenuItem-pickElement" type="checkbox" />
+                                <span>Pick element for Markdown</span>
+                                <small class="context-menu-item-scope">Page</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-copySelection">
+                                <input name="contextMenuItems.copySelection" id="contextMenuItem-copySelection" type="checkbox" />
+                                <span>Copy selection as Markdown</span>
+                                <small class="context-menu-item-scope">Selection</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-copyLink">
+                                <input name="contextMenuItems.copyLink" id="contextMenuItem-copyLink" type="checkbox" />
+                                <span>Copy link as Markdown</span>
+                                <small class="context-menu-item-scope">Link</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-copyImage">
+                                <input name="contextMenuItems.copyImage" id="contextMenuItem-copyImage" type="checkbox" />
+                                <span>Copy image as Markdown</span>
+                                <small class="context-menu-item-scope">Image</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-copyTab">
+                                <input name="contextMenuItems.copyTab" id="contextMenuItem-copyTab" type="checkbox" />
+                                <span>Copy tab as Markdown</span>
+                                <small class="context-menu-item-scope">Page</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-copyTabLink">
+                                <input name="contextMenuItems.copyTabLink" id="contextMenuItem-copyTabLink" type="checkbox" />
+                                <span>Copy tab URL as Markdown link</span>
+                                <small class="context-menu-item-scope">Page/tab</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-copyAllTabLinks">
+                                <input name="contextMenuItems.copyAllTabLinks" id="contextMenuItem-copyAllTabLinks" type="checkbox" />
+                                <span>Copy all tab URLs as link list</span>
+                                <small class="context-menu-item-scope">Page/tab</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-copySelectedTabLinks">
+                                <input name="contextMenuItems.copySelectedTabLinks" id="contextMenuItem-copySelectedTabLinks" type="checkbox" />
+                                <span>Copy selected tab URLs as link list</span>
+                                <small class="context-menu-item-scope">Page/tab</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-sendSelectionToObsidian">
+                                <input name="contextMenuItems.sendSelectionToObsidian" id="contextMenuItem-sendSelectionToObsidian" type="checkbox" />
+                                <span>Send selection to Obsidian</span>
+                                <small class="context-menu-item-scope">Selection + Obsidian</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-sendTabToObsidian">
+                                <input name="contextMenuItems.sendTabToObsidian" id="contextMenuItem-sendTabToObsidian" type="checkbox" />
+                                <span>Send tab to Obsidian</span>
+                                <small class="context-menu-item-scope">Page + Obsidian</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-toggleIncludeTemplate">
+                                <input name="contextMenuItems.toggleIncludeTemplate" id="contextMenuItem-toggleIncludeTemplate" type="checkbox" />
+                                <span>Include template toggle</span>
+                                <small class="context-menu-item-scope">Page/tab</small>
+                            </label>
+                            <label class="context-menu-item-checkbox" for="contextMenuItem-toggleDownloadImages">
+                                <input name="contextMenuItems.toggleDownloadImages" id="contextMenuItem-toggleDownloadImages" type="checkbox" />
+                                <span>Download images toggle</span>
+                                <small class="context-menu-item-scope">Page/tab</small>
+                            </label>
+                        </div>
                     </div>
                 </div>
 

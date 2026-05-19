@@ -74,6 +74,49 @@ describe('Content Script DOM Capture', () => {
     expect(capturedDocument.getElementById('visible-div')).toBeTruthy();
   });
 
+  test('manual element capture serializes only the selected element body', () => {
+    const selected = document.getElementById('visible-div');
+    selected.innerHTML = '<h2>Manual Capture Heading</h2><p>Manual body text.</p>';
+
+    const result = captureElementForMarkdown(selected);
+    const parser = new DOMParser();
+    const capturedDocument = parser.parseFromString(result.dom, 'text/html');
+
+    expect(result.elementTitle).toBe('Manual Capture Heading');
+    expect(result.elementLabel).toBe('div#visible-div');
+    expect(capturedDocument.body.textContent).toContain('Manual body text.');
+    expect(capturedDocument.getElementById('visible-div')).toBeTruthy();
+    expect(capturedDocument.getElementById('root')).toBeNull();
+  });
+
+  test('manual element capture removes hidden descendants when requested', () => {
+    const selected = document.getElementById('root');
+
+    const result = captureElementForMarkdown(selected, { skipHiddenContent: true });
+    const parser = new DOMParser();
+    const capturedDocument = parser.parseFromString(result.dom, 'text/html');
+
+    expect(capturedDocument.getElementById('hidden-img')).toBeNull();
+    expect(capturedDocument.getElementById('hidden-div')).toBeNull();
+    expect(capturedDocument.getElementById('visible-img')).toBeTruthy();
+    expect(capturedDocument.getElementById('visible-div')).toBeTruthy();
+  });
+
+  test('manual body capture excludes element picker chrome', () => {
+    const pickerChrome = document.createElement('div');
+    pickerChrome.setAttribute('data-marksnip-element-picker-ui', 'true');
+    pickerChrome.textContent = 'Picker controls should not be captured';
+    document.body.appendChild(pickerChrome);
+
+    const result = captureElementForMarkdown(document.body);
+    const parser = new DOMParser();
+    const capturedDocument = parser.parseFromString(result.dom, 'text/html');
+
+    expect(capturedDocument.body.textContent).toContain('Visible text');
+    expect(capturedDocument.body.textContent).not.toContain('Picker controls should not be captured');
+    expect(capturedDocument.querySelector('[data-marksnip-element-picker-ui="true"]')).toBeNull();
+  });
+
   test('marksnipPrepareForCapture should request MathJax sync for rendered nodes', async () => {
     const mathNode = document.createElement('mjx-container');
     document.getElementById('visible-div').appendChild(mathNode);

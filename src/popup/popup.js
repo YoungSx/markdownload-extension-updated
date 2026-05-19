@@ -51,6 +51,8 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 const POPUP_VIEW_TRANSITION_MS = 180;
 const POPUP_THEME_CACHE_KEY = 'marksnip-popup-theme-cache-v1';
 const THEME_TRANSITION_FALLBACK_MS = 220;
+const ELEMENT_PICKER_RESULT_STORAGE_KEY = 'elementPickerResult';
+const ELEMENT_PICKER_RESULT_MAX_AGE_MS = 10 * 60 * 1000;
 const countUtils = globalThis.markSnipCountUtils;
 const COUNT_MODES = Array.isArray(countUtils?.COUNT_MODES) && countUtils.COUNT_MODES.length > 0
     ? countUtils.COUNT_MODES
@@ -330,6 +332,8 @@ function normalizePopupOptions(source = {}) {
     normalizedOptions.defaultExportType = POPUP_PRIMARY_ACTION_SET.has(normalizedOptions.defaultExportType) || isWebhookExportType(normalizedOptions.defaultExportType)
         ? normalizedOptions.defaultExportType
         : defaultOptions.defaultExportType;
+    normalizedOptions.elementPickerEnabled = normalizedOptions.elementPickerEnabled !== false;
+    normalizedOptions.elementPickerDoneAction = normalizedOptions.elementPickerDoneAction === 'copy' ? 'copy' : 'popup';
     if (isWebhookExportType(normalizedOptions.defaultExportType)) {
         const targetId = getWebhookTargetIdFromExportType(normalizedOptions.defaultExportType);
         const targetExists = normalizedOptions.webhookTargets.some((t) => t.id === targetId);
@@ -404,6 +408,8 @@ const dom = {
     downloadImagesRuleHint: document.getElementById('downloadImagesRuleHint'),
     selectedButton: document.getElementById('selected'),
     documentButton: document.getElementById('document'),
+    elementPickerRow: document.getElementById('elementPickerRow'),
+    pickElementButton: document.getElementById('pickElement'),
     clipOption: document.getElementById('clipOption'),
     urlList: document.getElementById('urlList'),
     convertUrlsButton: document.getElementById('convertUrls'),
@@ -1961,6 +1967,7 @@ dom.shortcutsModalBody?.addEventListener('click', (e) => {
     }
 });
 dom.pickLinksButton?.addEventListener("click", activateLinkPicker);
+dom.pickElementButton?.addEventListener("click", activateElementPicker);
 dom.batchSaveModeToggle?.addEventListener("change", saveBatchSettings);
 progressUI.cancelBtn?.addEventListener("click", () => {
     browser.runtime.sendMessage({ type: 'cancel-batch' }).catch(() => {});
@@ -2092,6 +2099,76 @@ async function activateLinkPicker(e) {
     }
 }
 
+function setElementPickerButtonFeedback(label, state = null) {
+    const button = dom.pickElementButton;
+    if (!button) {
+        return;
+    }
+
+    button.classList.remove('success', 'error');
+    if (state) {
+        button.classList.add(state);
+    }
+
+    const labelElement = button.querySelector('span');
+    if (labelElement) {
+        labelElement.textContent = label;
+    }
+    button.title = label;
+    button.setAttribute('aria-label', label);
+}
+
+function resetElementPickerButtonFeedback() {
+    setElementPickerButtonFeedback(popupMessage('popupPickElementBtn', null, 'Pick Element'));
+}
+
+async function activateElementPicker(e) {
+    e.preventDefault();
+
+    try {
+        if (currentOptions?.elementPickerEnabled === false) {
+            return;
+        }
+
+        const activeTab = await getActiveTab();
+        if (!activeTab?.id) {
+            throw new Error(popupMessage('popupNoActiveTabError', null, 'No active tab found'));
+        }
+
+        if (isRestrictedTabUrl(activeTab.url || '')) {
+            showError(getRestrictedPageMessage(activeTab.url || ''));
+            return;
+        }
+
+        setElementPickerButtonFeedback(popupMessage('popupPickElementStarting', null, 'Pick on page...'), 'success');
+
+        await browser.scripting.executeScript({
+            target: { tabId: activeTab.id },
+            files: ["/browser-polyfill.min.js", "/shared/i18n.js", "/contentScript/contentScript.js"]
+        }).catch(err => {
+            console.log("Content script may already be injected:", err);
+        });
+
+        const response = await browser.tabs.sendMessage(activeTab.id, {
+            type: "ACTIVATE_ELEMENT_PICKER",
+            captureOptions: {
+                skipHiddenContent: currentOptions?.skipHiddenContent === true
+            }
+        });
+        if (response?.success === false) {
+            throw new Error(response.error || popupMessage('popupAlertFailedToActivateElementPicker', null, 'Failed to activate element picker. Please try again.'));
+        }
+
+        await browser.tabs.update(activeTab.id, { active: true });
+        setTimeout(resetElementPickerButtonFeedback, 1200);
+    } catch (error) {
+        console.error("Error activating element picker:", error);
+        setElementPickerButtonFeedback(popupMessage('popupPickElementFailed', null, 'Picker failed'), 'error');
+        setTimeout(resetElementPickerButtonFeedback, 2200);
+        alert(popupMessage('popupAlertFailedToActivateElementPicker', null, 'Failed to activate element picker. Please try again.'));
+    }
+}
+
 const defaultOptions = {
     includeTemplate: false,
     clipSelection: true,
@@ -2110,6 +2187,8 @@ const defaultOptions = {
     specialThemeIcon: true,
     popupAccent: 'sage',
     compactMode: false,
+    elementPickerEnabled: true,
+    elementPickerDoneAction: 'popup',
     showThemeToggleInPopup: true,
     showUserGuideIcon: true,
     editorTheme: 'default',
@@ -2176,6 +2255,76 @@ function updateCurrentClipState(nextState = {}) {
     };
     updateSaveLibraryButtonState();
     queuePersistAgentBridgeClip(currentClipState);
+}
+
+function isPendingElementPickerResultForTab(result, tab) {
+    if (!result || !tab?.id) {
+        return false;
+    }
+
+    const capturedAt = Number(result.capturedAt || 0);
+    if (!capturedAt || Date.now() - capturedAt > ELEMENT_PICKER_RESULT_MAX_AGE_MS) {
+        return false;
+    }
+
+    if (Number.isInteger(result.tabId) && result.tabId === tab.id) {
+        return true;
+    }
+
+    const resultUrl = String(result.pageUrl || result.article?.pageURL || result.article?.tabURL || '').trim();
+    const tabUrl = String(tab.url || '').trim();
+    return Boolean(resultUrl && tabUrl && resultUrl === tabUrl);
+}
+
+async function consumePendingElementPickerResult(activeTab) {
+    try {
+        const stored = await browser.storage.local.get(ELEMENT_PICKER_RESULT_STORAGE_KEY);
+        const pendingResult = stored?.[ELEMENT_PICKER_RESULT_STORAGE_KEY];
+
+        if (!pendingResult) {
+            return false;
+        }
+
+        if (!isPendingElementPickerResultForTab(pendingResult, activeTab)) {
+            if (Number(pendingResult.capturedAt || 0) &&
+                Date.now() - Number(pendingResult.capturedAt || 0) > ELEMENT_PICKER_RESULT_MAX_AGE_MS) {
+                await browser.storage.local.remove(ELEMENT_PICKER_RESULT_STORAGE_KEY);
+            }
+            return false;
+        }
+
+        await browser.storage.local.remove(ELEMENT_PICKER_RESULT_STORAGE_KEY);
+        notify({
+            type: 'display.md',
+            markdown: pendingResult.markdown,
+            article: pendingResult.article,
+            imageList: pendingResult.imageList,
+            sourceImageMap: pendingResult.sourceImageMap,
+            mdClipsFolder: pendingResult.mdClipsFolder,
+            options: pendingResult.effectiveOptions || currentOptions,
+            effectiveOptions: pendingResult.effectiveOptions || null,
+            matchedSiteRule: pendingResult.matchedSiteRule || null,
+            overriddenKeys: Array.isArray(pendingResult.overriddenKeys) ? pendingResult.overriddenKeys : []
+        });
+        showOrHideClipOption(false);
+        return true;
+    } catch (error) {
+        console.error('Failed to load pending element picker result:', error);
+        return false;
+    }
+}
+
+const updateElementPickerButtonVisibility = (options) => {
+    const shouldShow = options?.elementPickerEnabled !== false;
+    const target = dom.elementPickerRow || dom.pickElementButton;
+    if (!target) return;
+
+    target.hidden = !shouldShow;
+    target.style.display = shouldShow ? "" : "none";
+    target.setAttribute("aria-hidden", String(!shouldShow));
+    if (dom.pickElementButton) {
+        dom.pickElementButton.disabled = !shouldShow;
+    }
 }
 
 function clonePopupOptionsSnapshot(source = currentOptions || defaultOptions) {
@@ -3463,7 +3612,9 @@ const checkInitialSettings = options => {
     updateObsidianButtonVisibility(currentOptions);
     updateGuideButtonVisibility(currentOptions);
     updateBatchProcessButtonVisibility(currentOptions);
+    updateElementPickerButtonVisibility(currentOptions);
     updatePopupExportControls(currentOptions);
+    resetElementPickerButtonFeedback();
 
     // Set segmented control state
     setClipSelectionState(currentOptions.clipSelection);
@@ -3750,6 +3901,12 @@ async function initializePopup() {
             return;
         }
 
+        const consumedElementPickerResult = await consumePendingElementPickerResult(activeTab);
+        if (consumedElementPickerResult) {
+            await editorPromise;
+            return;
+        }
+
         const clipPromise = ensureContentScriptInjected(activeTab.id).then(() => {
             console.info("Successfully injected MarkSnip content script");
             return clipSite(activeTab.id);
@@ -3791,6 +3948,13 @@ browser.storage.onChanged.addListener((changes, areaName) => {
                 batchProcessingEnabled: changes.batchProcessingEnabled.newValue !== false
             });
             updateBatchProcessButtonVisibility(currentOptions);
+        }
+        if (changes.elementPickerEnabled) {
+            currentOptions = normalizePopupOptions({
+                ...currentOptions,
+                elementPickerEnabled: changes.elementPickerEnabled.newValue !== false
+            });
+            updateElementPickerButtonVisibility(currentOptions);
         }
         if (popupActionKeys.some((key) => Object.prototype.hasOwnProperty.call(changes, key))) {
             currentOptions = normalizePopupOptions({

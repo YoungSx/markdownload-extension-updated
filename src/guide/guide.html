@@ -177,14 +177,15 @@
 
                 <div id="clipping-scope" class="guide-subsection"
                     data-guide-section="Clipping Scope"
-                    data-guide-summary="Choose between selection and full document clipping"
-                    data-search-keywords="selection,document,full page,clip scope,segmented control,content scope">
+                    data-guide-summary="Choose between selection, document, and manual element clipping"
+                    data-search-keywords="selection,document,full page,clip scope,segmented control,content scope,element picker,manual extraction,pick element">
                     <h3 class="subsection-heading"><a href="#clipping-scope" class="anchor-link">#</a>Clipping Selection vs. Full Document</h3>
                     <p>Below the toggles is a segmented control with two buttons:</p>
                     <ul>
                         <li><strong>Selection</strong> &mdash; clips only the text you selected on the page before opening the popup.</li>
                         <li><strong>Document</strong> &mdash; clips the entire page content (default if nothing is selected).</li>
                     </ul>
+                    <p>Use <strong>Pick Element</strong> when the automatic article extraction misses part of a page. MarkSnip will switch to the page, let you choose an element with an inspect-style picker, and then load that element as Markdown in the popup for review or copy it directly, depending on your Element Picker setting.</p>
                 </div>
 
                 <div id="editing-title" class="guide-subsection"
@@ -398,7 +399,7 @@ author: {byline}
                     data-search-keywords="context menus toggle,enable context menus,assistant url length,max url length,clipboard fallback">
                     <h3 class="subsection-heading"><a href="#download-settings" class="anchor-link">#</a>Downloads</h3>
                     <h4>Context Menus</h4>
-                    <p>Toggles the right-click context menu items on and off. Default: <strong>On</strong>.</p>
+                    <p>Toggles the right-click context menu items on and off. Use <strong>Visible Menu Items</strong> to choose the individual MarkSnip actions that are allowed to appear. Browsers only show items that apply to where you right-click, such as page, selection, link, image, or tab menus. Default: <strong>On</strong>, with all menu items visible.</p>
                     <h4 data-i18n="guideSettingsDownloadsAction">Default Popup Action</h4>
                     <p>Controls the popup's primary action buttons. Choose <strong>Markdown</strong>, <strong>Plain text</strong>, <strong>HTML</strong>, <strong>PDF</strong>, or <strong>Send to Assistant</strong>. This does not change context-menu downloads, keyboard download shortcuts, batch output, Library exports, Agent Bridge output, or Obsidian sends.</p>
                     <h4 data-i18n="guideSettingsDownloadsTarget">Default Assistant Target</h4>

@@ -42,6 +42,8 @@ describe('Popup startup assets', () => {
     expect(document.getElementById('download')).not.toBeNull();
     expect(document.getElementById('splitArrow')).not.toBeNull();
     expect(document.getElementById('splitDropdown')).not.toBeNull();
+    expect(document.getElementById('elementPickerRow')).not.toBeNull();
+    expect(document.getElementById('pickElement')).not.toBeNull();
     expect(document.getElementById('ddSendToChatgpt')).not.toBeNull();
     expect(document.getElementById('ddSendToClaude')).not.toBeNull();
     expect(document.getElementById('ddSendToPerplexity')).not.toBeNull();

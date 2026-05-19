@@ -72,9 +72,60 @@ const SITE_RULE_TEXT_FIELD_IDS = {
 	    return globalThis.markSnipI18n?.t(key, substitutions, fallback) || fallback || key;
 	}
 
-	function getOptionsStateApi() {
-	    return globalThis.markSnipOptionsState || null;
-	}
+		function getOptionsStateApi() {
+		    return globalThis.markSnipOptionsState || null;
+		}
+
+function getDefaultContextMenuItemsState() {
+    return defaultOptions?.contextMenuItems && typeof defaultOptions.contextMenuItems === 'object'
+        ? defaultOptions.contextMenuItems
+        : {};
+}
+
+function normalizeContextMenuItemsState(contextMenuItems) {
+    const optionsStateApi = getOptionsStateApi();
+    if (optionsStateApi?.normalizeContextMenuItems) {
+        return optionsStateApi.normalizeContextMenuItems(contextMenuItems, getDefaultContextMenuItemsState());
+    }
+
+    const defaults = getDefaultContextMenuItemsState();
+    const source = contextMenuItems && typeof contextMenuItems === 'object' ? contextMenuItems : {};
+    return Object.keys(defaults).reduce((normalized, key) => {
+        normalized[key] = Object.prototype.hasOwnProperty.call(source, key)
+            ? source[key] !== false
+            : defaults[key] !== false;
+        return normalized;
+    }, {});
+}
+
+function getContextMenuItemsFromControls() {
+    const currentItems = normalizeContextMenuItemsState(options.contextMenuItems);
+    document.querySelectorAll("input[name^='contextMenuItems.']").forEach((input) => {
+        const itemKey = input.name.split('.')[1];
+        if (itemKey) {
+            currentItems[itemKey] = input.checked;
+        }
+    });
+    return normalizeContextMenuItemsState(currentItems);
+}
+
+function setContextMenuItemControls(contextMenuItems) {
+    const normalizedItems = normalizeContextMenuItemsState(contextMenuItems);
+    document.querySelectorAll("input[name^='contextMenuItems.']").forEach((input) => {
+        const itemKey = input.name.split('.')[1];
+        input.checked = normalizedItems[itemKey] !== false;
+    });
+}
+
+async function setAllContextMenuItems(enabled) {
+    options.contextMenuItems = Object.keys(getDefaultContextMenuItemsState()).reduce((items, key) => {
+        items[key] = Boolean(enabled);
+        return items;
+    }, {});
+    setContextMenuItemControls(options.contextMenuItems);
+    await save();
+    refreshElements();
+}
 
 function getLibraryStateApi() {
     return globalThis.markSnipLibraryState || null;
@@ -1681,9 +1732,10 @@ function normalizeImportedOptionsState(importedOptions) {
         normalizedOptions.sendToMaxUrlLength,
         defaultOptions?.sendToMaxUrlLength
     );
-    normalizedOptions.webhookTargets = normalizeWebhookTargetsState(normalizedOptions.webhookTargets);
+	    normalizedOptions.webhookTargets = normalizeWebhookTargetsState(normalizedOptions.webhookTargets);
+	    normalizedOptions.contextMenuItems = normalizeContextMenuItemsState(normalizedOptions.contextMenuItems);
 
-    const validPrimaryActions = new Set(['markdown', 'text', 'html', 'pdf', 'copy', 'sendTo']);
+	    const validPrimaryActions = new Set(['markdown', 'text', 'html', 'pdf', 'copy', 'sendTo']);
     const exportType = String(normalizedOptions.defaultExportType || '').trim();
     normalizedOptions.defaultExportType = validPrimaryActions.has(exportType) || exportType.startsWith('webhook:')
       ? exportType
@@ -1993,10 +2045,11 @@ const saveOptions = e => {
         ),
         webhookTargets: getNormalizedWebhookTargets(),
         turndownEscape: document.querySelector("[name='turndownEscape']").checked,
-        skipHiddenContent: document.querySelector("[name='skipHiddenContent']").checked,
-        hashtagHandling: getCheckedValue(document.querySelectorAll("input[name='hashtagHandling']")),
-        contextMenus: document.querySelector("[name='contextMenus']").checked,
-        batchProcessingEnabled: document.querySelector("[name='batchProcessingEnabled']").checked,
+	        skipHiddenContent: document.querySelector("[name='skipHiddenContent']").checked,
+	        hashtagHandling: getCheckedValue(document.querySelectorAll("input[name='hashtagHandling']")),
+	        contextMenus: document.querySelector("[name='contextMenus']").checked,
+	        contextMenuItems: getContextMenuItemsFromControls(),
+	        batchProcessingEnabled: document.querySelector("[name='batchProcessingEnabled']").checked,
         obsidianIntegration: document.querySelector("[name='obsidianIntegration']").checked,
         obsidianVault: document.querySelector("[name='obsidianVault']").value,
         obsidianFolder: document.querySelector("[name='obsidianFolder']").value,
@@ -2030,6 +2083,8 @@ const saveOptions = e => {
         specialThemeIcon: document.querySelector("[name='specialThemeIcon']").checked,
 	        popupAccent: getCheckedValue(document.querySelectorAll("input[name='popupAccent']")),
 	        compactMode: document.querySelector("[name='compactMode']").checked,
+	        elementPickerEnabled: document.querySelector("[name='elementPickerEnabled']").checked,
+	        elementPickerDoneAction: getCheckedValue(document.querySelectorAll("input[name='elementPickerDoneAction']")) || 'popup',
 	        showThemeToggleInPopup: document.querySelector("[name='showThemeToggleInPopup']").checked,
 	        showUserGuideIcon: document.querySelector("[name='showUserGuideIcon']").checked,
 	        editorTheme: getCheckedValue(document.querySelectorAll("input[name='editorTheme']")),
@@ -2220,10 +2275,11 @@ const setCurrentChoice = result => {
     document.querySelector("[name='downloadImages']").checked = options.downloadImages;
     document.querySelector("[name='imagePrefix']").value = options.imagePrefix;
     document.querySelector("[name='mdClipsFolder']").value = result.mdClipsFolder;
-    document.querySelector("[name='turndownEscape']").checked = options.turndownEscape;
-    document.querySelector("[name='skipHiddenContent']").checked = options.skipHiddenContent;
-    document.querySelector("[name='contextMenus']").checked = options.contextMenus;
-    document.querySelector("[name='batchProcessingEnabled']").checked = options.batchProcessingEnabled !== false;
+	    document.querySelector("[name='turndownEscape']").checked = options.turndownEscape;
+	    document.querySelector("[name='skipHiddenContent']").checked = options.skipHiddenContent;
+	    document.querySelector("[name='contextMenus']").checked = options.contextMenus;
+	    setContextMenuItemControls(options.contextMenuItems);
+	    document.querySelector("[name='batchProcessingEnabled']").checked = options.batchProcessingEnabled !== false;
     document.querySelector("[name='obsidianIntegration']").checked = options.obsidianIntegration;
     document.querySelector("[name='obsidianVault']").value = options.obsidianVault;
     document.querySelector("[name='obsidianFolder']").value = options.obsidianFolder;
@@ -2266,6 +2322,8 @@ const setCurrentChoice = result => {
     document.querySelector("[name='specialThemeIcon']").checked = options.specialThemeIcon !== false;
     setCheckedValue(document.querySelectorAll("[name='popupAccent']"), options.popupAccent || 'sage');
     document.querySelector("[name='compactMode']").checked = options.compactMode || false;
+    document.querySelector("[name='elementPickerEnabled']").checked = options.elementPickerEnabled !== false;
+    setCheckedValue(document.querySelectorAll("[name='elementPickerDoneAction']"), options.elementPickerDoneAction === 'copy' ? 'copy' : 'popup');
     document.querySelector("[name='showThemeToggleInPopup']").checked = options.showThemeToggleInPopup !== false;
     document.querySelector("[name='showUserGuideIcon']").checked = options.showUserGuideIcon !== false;
     setCheckedValue(document.querySelectorAll("[name='editorTheme']"), options.editorTheme || 'default');
@@ -2514,14 +2572,20 @@ const inputChange = async (e) => {
                 e.target.value = value;
             }
 
-            // Handle nested table formatting options
-            if (key.startsWith('tableFormatting.')) {
-                const optionName = key.split('.')[1];
-                options.tableFormatting = options.tableFormatting || {};
-                options.tableFormatting[optionName] = value;
-            } else {
-                options[key] = value;
-            }
+	            // Handle nested option groups
+	            if (key.startsWith('tableFormatting.')) {
+	                const optionName = key.split('.')[1];
+	                options.tableFormatting = options.tableFormatting || {};
+	                options.tableFormatting[optionName] = value;
+	            } else if (key.startsWith('contextMenuItems.')) {
+	                const itemKey = key.split('.')[1];
+	                options.contextMenuItems = normalizeContextMenuItemsState(options.contextMenuItems);
+	                if (itemKey) {
+	                    options.contextMenuItems[itemKey] = Boolean(value);
+	                }
+	            } else {
+	                options[key] = value;
+	            }
  
             if (key == "contextMenus") {
                 if (value) { createMenus() }
@@ -2548,15 +2612,21 @@ const buttonClick = async (e) => {
         const json = JSON.stringify(buildExportPayload(), null, 2);
         var blob = new Blob([json], { type: "text/json" });
         var url = URL.createObjectURL(blob);
-        browser.downloads.download({
-            url: url,
-            saveAs: true,
-            filename: buildExportFilenameState(new Date())
-        });
-    }
-    else if (e.target.id == "clear-library" || e.target.closest('#clear-library')) {
-        clearLibraryItems();
-    }
+	        browser.downloads.download({
+	            url: url,
+	            saveAs: true,
+	            filename: buildExportFilenameState(new Date())
+	        });
+	    }
+	    else if (e.target.id == "contextMenuItemsEnableAll" || e.target.closest('#contextMenuItemsEnableAll')) {
+	        await setAllContextMenuItems(true);
+	    }
+	    else if (e.target.id == "contextMenuItemsDisableAll" || e.target.closest('#contextMenuItemsDisableAll')) {
+	        await setAllContextMenuItems(false);
+	    }
+	    else if (e.target.id == "clear-library" || e.target.closest('#clear-library')) {
+	        clearLibraryItems();
+	    }
     else if (e.target.id == "refreshAgentBridgeStatus" || e.target.closest('#refreshAgentBridgeStatus')) {
         const refreshBtn = document.getElementById('refreshAgentBridgeStatus');
         const needsPermission = usesOptionalNativeMessagingPermission() && agentBridgeSettings.enabled && !agentBridgeStatus.permissionGranted;

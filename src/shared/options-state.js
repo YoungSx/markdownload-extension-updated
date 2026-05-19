@@ -131,6 +131,17 @@
       : normalizedFallback;
   }
 
+  function normalizeContextMenuItems(contextMenuItems, defaultContextMenuItems = {}) {
+    const safeDefaults = isPlainObject(defaultContextMenuItems) ? defaultContextMenuItems : {};
+    const safeItems = isPlainObject(contextMenuItems) ? contextMenuItems : {};
+    return Object.keys(safeDefaults).reduce((normalized, key) => {
+      normalized[key] = Object.prototype.hasOwnProperty.call(safeItems, key)
+        ? safeItems[key] !== false
+        : safeDefaults[key] !== false;
+      return normalized;
+    }, {});
+  }
+
   const VALID_WEBHOOK_METHODS = new Set(['POST', 'PUT', 'PATCH']);
 
   function normalizeWebhookTargets(targets) {
@@ -211,10 +222,36 @@
     const previousEnabled = Boolean(previousOptions.contextMenus);
     const nextEnabled = Boolean(nextOptions.contextMenus);
 
-    if (previousEnabled === nextEnabled) {
-      return 'none';
+    if (previousEnabled !== nextEnabled) {
+      return nextEnabled ? 'create' : 'remove';
     }
-    return nextEnabled ? 'create' : 'remove';
+
+    if (nextEnabled && haveContextMenuItemsChanged(previousOptions.contextMenuItems, nextOptions.contextMenuItems)) {
+      return 'create';
+    }
+
+    return 'none';
+  }
+
+  function haveContextMenuItemsChanged(previousItems, nextItems) {
+    if (!isPlainObject(previousItems) && !isPlainObject(nextItems)) {
+      return false;
+    }
+
+    const keys = new Set([
+      ...Object.keys(isPlainObject(previousItems) ? previousItems : {}),
+      ...Object.keys(isPlainObject(nextItems) ? nextItems : {})
+    ]);
+
+    for (const key of keys) {
+      const previousEnabled = !isPlainObject(previousItems) || previousItems[key] !== false;
+      const nextEnabled = !isPlainObject(nextItems) || nextItems[key] !== false;
+      if (previousEnabled !== nextEnabled) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   function normalizeImportedOptions(importedOptions = {}, defaultOptions = {}) {
@@ -238,6 +275,11 @@
       ...defaultTableFormatting,
       ...importedTableFormatting
     };
+
+    normalized.contextMenuItems = normalizeContextMenuItems(
+      normalized.contextMenuItems,
+      safeDefaults.contextMenuItems
+    );
 
     if (siteRulesApi?.normalizeSiteRules) {
       normalized.siteRules = siteRulesApi.normalizeSiteRules(normalized.siteRules);
@@ -349,6 +391,7 @@
     normalizeCustomSendToTargets,
     normalizeDefaultSendToTarget,
     normalizeSendToMaxUrlLength,
+    normalizeContextMenuItems,
     normalizeWebhookTargets
   };
 

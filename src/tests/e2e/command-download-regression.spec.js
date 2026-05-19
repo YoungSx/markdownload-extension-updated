@@ -136,6 +136,7 @@ test.describe('Command And Download Regression E2E', () => {
         'copyTabAsMarkdownLinkAll',
         'copySelectedTabAsMarkdownLink',
         'copyTabAsMarkdownLink',
+        'activateElementPickerFromContext',
         'toggleSetting',
       ];
       for (const fn of requiredFns) {
@@ -167,6 +168,10 @@ test.describe('Command And Download Regression E2E', () => {
       spy('copyTabAsMarkdownLinkAll', ([tab]) => ({ tabId: tab?.id ?? null }));
       spy('copySelectedTabAsMarkdownLink', ([tab]) => ({ tabId: tab?.id ?? null }));
       spy('copyTabAsMarkdownLink', ([tab]) => ({ tabId: tab?.id ?? null }));
+      spy('activateElementPickerFromContext', ([info, tab]) => ({
+        menuItemId: info?.menuItemId ?? null,
+        tabId: tab?.id ?? null,
+      }));
       spy('toggleSetting', ([setting]) => ({ setting }));
 
       const tab = { id: 42, url: fixtureUrl };
@@ -178,6 +183,7 @@ test.describe('Command And Download Regression E2E', () => {
         await handleContextMenuClick({ menuItemId: 'copy-tab-as-markdown-link-all' }, tab);
         await handleContextMenuClick({ menuItemId: 'copy-tab-as-markdown-link-selected' }, tab);
         await handleContextMenuClick({ menuItemId: 'copy-tab-as-markdown-link' }, tab);
+        await handleContextMenuClick({ menuItemId: 'pick-element-markdown' }, tab);
         await handleContextMenuClick({ menuItemId: 'toggle-includeTemplate' }, tab);
       } finally {
         for (const [name, original] of Object.entries(originals)) {
@@ -188,7 +194,7 @@ test.describe('Command And Download Regression E2E', () => {
       return calls;
     }, { fixtureUrl: `${fixtureHost}${fixturePath}` });
 
-    expect(calls).toHaveLength(7);
+    expect(calls).toHaveLength(8);
     expect(calls).toEqual([
       expect.objectContaining({ fn: 'copyMarkdownFromContext', menuItemId: 'copy-markdown-all' }),
       expect.objectContaining({ fn: 'downloadMarkdownFromContext', menuItemId: 'download-markdown-all' }),
@@ -196,7 +202,205 @@ test.describe('Command And Download Regression E2E', () => {
       expect.objectContaining({ fn: 'copyTabAsMarkdownLinkAll' }),
       expect.objectContaining({ fn: 'copySelectedTabAsMarkdownLink' }),
       expect.objectContaining({ fn: 'copyTabAsMarkdownLink' }),
+      expect.objectContaining({ fn: 'activateElementPickerFromContext', menuItemId: 'pick-element-markdown' }),
       expect.objectContaining({ fn: 'toggleSetting', setting: 'includeTemplate' }),
+    ]);
+  });
+
+  test('context menus include element picker only when enabled', async () => {
+    const result = await serviceWorker.evaluate(async () => {
+      if (typeof self.createMenus !== 'function') {
+        throw new Error('Missing function in service worker: createMenus');
+      }
+
+      const originals = {
+        getOptions: self.getOptions,
+        create: browser.contextMenus.create,
+        removeAll: browser.contextMenus.removeAll,
+      };
+      const createdWithPicker = [];
+      const createdWithoutPicker = [];
+
+      try {
+        browser.contextMenus.removeAll = () => Promise.resolve();
+        browser.contextMenus.create = (props, callback) => {
+          createdWithPicker.push(JSON.parse(JSON.stringify(props)));
+          callback?.();
+          return props.id;
+        };
+        self.getOptions = async () => ({
+          contextMenus: true,
+          includeTemplate: false,
+          downloadImages: false,
+          obsidianIntegration: false,
+          elementPickerEnabled: true,
+        });
+        await createMenus();
+
+        browser.contextMenus.create = (props, callback) => {
+          createdWithoutPicker.push(JSON.parse(JSON.stringify(props)));
+          callback?.();
+          return props.id;
+        };
+        self.getOptions = async () => ({
+          contextMenus: true,
+          includeTemplate: false,
+          downloadImages: false,
+          obsidianIntegration: false,
+          elementPickerEnabled: false,
+        });
+        await createMenus();
+      } finally {
+        self.getOptions = originals.getOptions;
+        browser.contextMenus.create = originals.create;
+        browser.contextMenus.removeAll = originals.removeAll;
+      }
+
+      return {
+        enabledIds: createdWithPicker.map(item => item.id),
+        disabledIds: createdWithoutPicker.map(item => item.id),
+      };
+    });
+
+    expect(result.enabledIds).toContain('pick-element-markdown');
+    expect(result.disabledIds).not.toContain('pick-element-markdown');
+  });
+
+  test('context menu item preferences hide disabled actions', async () => {
+    const result = await serviceWorker.evaluate(async () => {
+      if (typeof self.createMenus !== 'function') {
+        throw new Error('Missing function in service worker: createMenus');
+      }
+
+      const originals = {
+        getOptions: self.getOptions,
+        create: browser.contextMenus.create,
+        removeAll: browser.contextMenus.removeAll,
+      };
+      const created = [];
+
+      try {
+        browser.contextMenus.removeAll = () => Promise.resolve();
+        browser.contextMenus.create = (props, callback) => {
+          created.push(JSON.parse(JSON.stringify(props)));
+          callback?.();
+          return props.id;
+        };
+
+        const contextMenuItems = Object.keys(self.defaultOptions.contextMenuItems).reduce((items, key) => {
+          items[key] = false;
+          return items;
+        }, {});
+        contextMenuItems.copyTabLink = true;
+
+        self.getOptions = async () => ({
+          contextMenus: true,
+          contextMenuItems,
+          includeTemplate: false,
+          downloadImages: false,
+          obsidianIntegration: true,
+          elementPickerEnabled: true,
+        });
+        await createMenus();
+      } finally {
+        self.getOptions = originals.getOptions;
+        browser.contextMenus.create = originals.create;
+        browser.contextMenus.removeAll = originals.removeAll;
+      }
+
+      return created.map(item => item.id);
+    });
+
+    expect(result).toContain('copy-tab-as-markdown-link');
+    expect(result).toContain('copy-tab-as-markdown-link-tab');
+    expect(result).not.toContain('download-markdown-all');
+    expect(result).not.toContain('copy-markdown-image');
+    expect(result.some(id => String(id).startsWith('separator'))).toBe(false);
+  });
+
+  test('element picker conversion copies result when configured', async () => {
+    const result = await serviceWorker.evaluate(async () => {
+      if (typeof self.handleElementPickerConvert !== 'function') {
+        throw new Error('Missing function in service worker: handleElementPickerConvert');
+      }
+
+      const originals = {
+        getOptions: self.getOptions,
+        ensureOffscreenDocumentExists: self.ensureOffscreenDocumentExists,
+        sendMessage: browser.runtime.sendMessage,
+        storageSet: browser.storage.local.set,
+        recordNotificationMetricsSafely: self.recordNotificationMetricsSafely,
+      };
+      const sentMessages = [];
+      const storedPayloads = [];
+      const metrics = [];
+
+      try {
+        self.getOptions = async () => ({
+          elementPickerDoneAction: 'copy',
+          skipHiddenContent: false,
+        });
+        self.ensureOffscreenDocumentExists = async () => {};
+        self.recordNotificationMetricsSafely = async (delta, context) => {
+          metrics.push({ delta, context });
+        };
+        browser.storage.local.set = async (payload) => {
+          storedPayloads.push(payload);
+        };
+        browser.runtime.sendMessage = async (message) => {
+          sentMessages.push(message);
+          if (message.type === 'process-element-content') {
+            return {
+              ok: true,
+              result: {
+                markdown: '## Manual Element\n\nCopied body',
+                article: { title: 'Manual Element' },
+                effectiveOptions: {}
+              }
+            };
+          }
+          if (message.type === 'copy-to-clipboard') {
+            return true;
+          }
+          return null;
+        };
+
+        const conversion = await handleElementPickerConvert({
+          payload: {
+            dom: '<html><body><section><h2>Manual Element</h2><p>Copied body</p></section></body></html>',
+            pageUrl: 'https://example.test/manual'
+          }
+        }, {
+          tab: { id: 99 }
+        });
+
+        return {
+          conversion,
+          sentMessages,
+          storedPayloads,
+          metrics
+        };
+      } finally {
+        self.getOptions = originals.getOptions;
+        self.ensureOffscreenDocumentExists = originals.ensureOffscreenDocumentExists;
+        browser.runtime.sendMessage = originals.sendMessage;
+        browser.storage.local.set = originals.storageSet;
+        self.recordNotificationMetricsSafely = originals.recordNotificationMetricsSafely;
+      }
+    });
+
+    expect(result.conversion).toEqual(expect.objectContaining({ ok: true, action: 'copy' }));
+    expect(result.sentMessages.map(message => message.type)).toEqual([
+      'process-element-content',
+      'copy-to-clipboard'
+    ]);
+    expect(result.sentMessages[1].text).toContain('Copied body');
+    expect(result.storedPayloads).toEqual([]);
+    expect(result.metrics).toEqual([
+      expect.objectContaining({
+        delta: expect.objectContaining({ copies: 1, exports: 0 }),
+        context: expect.objectContaining({ tabId: 99 })
+      })
     ]);
   });
 
