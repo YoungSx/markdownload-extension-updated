@@ -71,6 +71,10 @@
     "message": "将选区下载为 Markdown",
     "description": "Context menu item"
   },
+  "contextPickElement": {
+    "message": "选取元素转换为 Markdown",
+    "description": "Context menu item for activating manual element picker mode"
+  },
   "contextCopySelection": {
     "message": "将选区复制为 Markdown",
     "description": "Context menu item"
@@ -222,6 +226,22 @@
   "popupDownloadBtn": {
     "message": "下载",
     "description": "Button label"
+  },
+  "popupPickElementBtn": {
+    "message": "选取元素",
+    "description": "Button label for activating manual element picker mode"
+  },
+  "popupPickElementStarting": {
+    "message": "正在页面上选取...",
+    "description": "Temporary popup feedback after activating element picker mode"
+  },
+  "popupPickElementFailed": {
+    "message": "选取失败",
+    "description": "Temporary popup feedback when element picker activation fails"
+  },
+  "popupAlertFailedToActivateElementPicker": {
+    "message": "无法启动元素选取器，请重试。",
+    "description": "Alert shown when element picker mode cannot be activated"
   },
   "popupExportArrowTitle": {
     "message": "更多导出选项",
@@ -874,6 +894,54 @@
   "optionsMaxUrlLengthLabel": {
     "message": "最大 URL 长度",
     "description": "Input label"
+  },
+  "optionsSubgroupFilenameTemplates": {
+    "message": "文件名模板",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupContentTemplates": {
+    "message": "内容模板",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupThemeColors": {
+    "message": "主题与颜色",
+    "description": "Subgroup label — Appearance section"
+  },
+  "optionsSubgroupPopupMenus": {
+    "message": "弹窗与菜单",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupDownloads": {
+    "message": "下载",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupAssistantIntegration": {
+    "message": "助手集成",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupBlockElements": {
+    "message": "块级元素",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupInlineFormatting": {
+    "message": "内联格式",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupLinks": {
+    "message": "链接",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupImages": {
+    "message": "图片",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupContentFiltering": {
+    "message": "内容过滤",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupDataTransfer": {
+    "message": "数据传输",
+    "description": "Subgroup label — Import / Export section"
   },
   "optionsObsidianIntegrationTitle": {
     "message": "Obsidian 集成",
@@ -3524,5 +3592,61 @@
   "optionsAppearanceLanguageItalian": {
     "message": "Italiano",
     "description": "Label for the Italian language option"
+  },
+  "elementPickerTitle": {
+    "message": "元素选取器",
+    "description": "Title for in-page element picker overlay"
+  },
+  "elementPickerHoverInfo": {
+    "message": "悬停并点击元素，将其转换为 Markdown。",
+    "description": "Instruction text for element picker overlay"
+  },
+  "elementPickerSelectedPrefix": {
+    "message": "已选：",
+    "description": "Prefix before selected element label in element picker overlay"
+  },
+  "elementPickerParentBtn": {
+    "message": "父级",
+    "description": "Element picker button for selecting parent element"
+  },
+  "elementPickerChildBtn": {
+    "message": "子级",
+    "description": "Element picker button for selecting child element"
+  },
+  "elementPickerReselectBtn": {
+    "message": "重新选取",
+    "description": "Element picker button for clearing current selection"
+  },
+  "elementPickerCancelBtn": {
+    "message": "取消",
+    "description": "Element picker cancel button"
+  },
+  "elementPickerDoneBtn": {
+    "message": "完成",
+    "description": "Element picker done button"
+  },
+  "elementPickerUnknownElement": {
+    "message": "元素",
+    "description": "Fallback element label for element picker"
+  },
+  "elementPickerConverting": {
+    "message": "正在转换所选元素...",
+    "description": "Element picker status while conversion is running"
+  },
+  "elementPickerEmptyError": {
+    "message": "所选元素不包含可转换的内容。",
+    "description": "Element picker error when selected element has no content"
+  },
+  "elementPickerFailedError": {
+    "message": "元素转换失败。",
+    "description": "Element picker generic conversion error"
+  },
+  "elementPickerSuccess": {
+    "message": "元素已转换，打开 MarkSnip 查看结果。",
+    "description": "Element picker success notification"
+  },
+  "elementPickerCopySuccess": {
+    "message": "元素 Markdown 已复制到剪贴板。",
+    "description": "Element picker success notification when Done copies Markdown directly"
   }
 }

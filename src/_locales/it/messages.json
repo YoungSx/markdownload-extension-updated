@@ -71,6 +71,10 @@
     "message": "Scarica selezione come Markdown",
     "description": "Context menu item"
   },
+  "contextPickElement": {
+    "message": "Seleziona elemento per Markdown",
+    "description": "Context menu item for activating manual element picker mode"
+  },
   "contextCopySelection": {
     "message": "Copia selezione come Markdown",
     "description": "Context menu item"
@@ -222,6 +226,22 @@
   "popupDownloadBtn": {
     "message": "Scarica",
     "description": "Button label"
+  },
+  "popupPickElementBtn": {
+    "message": "Seleziona elemento",
+    "description": "Button label for activating manual element picker mode"
+  },
+  "popupPickElementStarting": {
+    "message": "Selezione in corso...",
+    "description": "Temporary popup feedback after activating element picker mode"
+  },
+  "popupPickElementFailed": {
+    "message": "Selezione fallita",
+    "description": "Temporary popup feedback when element picker activation fails"
+  },
+  "popupAlertFailedToActivateElementPicker": {
+    "message": "Impossibile attivare il selettore elementi. Riprova.",
+    "description": "Alert shown when element picker mode cannot be activated"
   },
   "popupExportArrowTitle": {
     "message": "Altre opzioni di esportazione",
@@ -874,6 +894,54 @@
   "optionsMaxUrlLengthLabel": {
     "message": "Lunghezza massima dell'URL",
     "description": "Input label"
+  },
+  "optionsSubgroupFilenameTemplates": {
+    "message": "Modelli nome file",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupContentTemplates": {
+    "message": "Modelli di contenuto",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupThemeColors": {
+    "message": "Tema e colori",
+    "description": "Subgroup label — Appearance section"
+  },
+  "optionsSubgroupPopupMenus": {
+    "message": "Popup e menu",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupDownloads": {
+    "message": "Download",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupAssistantIntegration": {
+    "message": "Integrazione assistente",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupBlockElements": {
+    "message": "Elementi di blocco",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupInlineFormatting": {
+    "message": "Formattazione inline",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupLinks": {
+    "message": "Link",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupImages": {
+    "message": "Immagini",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupContentFiltering": {
+    "message": "Filtro contenuto",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupDataTransfer": {
+    "message": "Trasferimento dati",
+    "description": "Subgroup label — Import / Export section"
   },
   "optionsObsidianIntegrationTitle": {
     "message": "Integrazione con Obsidian",
@@ -3524,5 +3592,61 @@
   "optionsLanguageSavedToast": {
     "message": "Lingua aggiornata — ricaricamento in corso…",
     "description": "Toast shown after the user changes the interface language"
+  },
+  "elementPickerTitle": {
+    "message": "Selettore elementi",
+    "description": "Title for in-page element picker overlay"
+  },
+  "elementPickerHoverInfo": {
+    "message": "Passa il cursore su un elemento e fai clic per convertirlo in Markdown.",
+    "description": "Instruction text for element picker overlay"
+  },
+  "elementPickerSelectedPrefix": {
+    "message": "Selezionato: ",
+    "description": "Prefix before selected element label in element picker overlay"
+  },
+  "elementPickerParentBtn": {
+    "message": "Genitore",
+    "description": "Element picker button for selecting parent element"
+  },
+  "elementPickerChildBtn": {
+    "message": "Figlio",
+    "description": "Element picker button for selecting child element"
+  },
+  "elementPickerReselectBtn": {
+    "message": "Riseleziona",
+    "description": "Element picker button for clearing current selection"
+  },
+  "elementPickerCancelBtn": {
+    "message": "Annulla",
+    "description": "Element picker cancel button"
+  },
+  "elementPickerDoneBtn": {
+    "message": "Fine",
+    "description": "Element picker done button"
+  },
+  "elementPickerUnknownElement": {
+    "message": "elemento",
+    "description": "Fallback element label for element picker"
+  },
+  "elementPickerConverting": {
+    "message": "Conversione dell'elemento selezionato...",
+    "description": "Element picker status while conversion is running"
+  },
+  "elementPickerEmptyError": {
+    "message": "L'elemento selezionato non contiene contenuto convertibile.",
+    "description": "Element picker error when selected element has no content"
+  },
+  "elementPickerFailedError": {
+    "message": "Conversione elemento fallita.",
+    "description": "Element picker generic conversion error"
+  },
+  "elementPickerSuccess": {
+    "message": "Elemento convertito. Apri MarkSnip per verificare.",
+    "description": "Element picker success notification"
+  },
+  "elementPickerCopySuccess": {
+    "message": "Markdown dell'elemento copiato negli appunti.",
+    "description": "Element picker success notification when Done copies Markdown directly"
   }
 }

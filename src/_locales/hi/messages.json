@@ -71,6 +71,10 @@
     "message": "चयन को मार्कडाउन के रूप में डाउनलोड करें",
     "description": "Context menu item"
   },
+  "contextPickElement": {
+    "message": "Markdown के लिए एलिमेंट चुनें",
+    "description": "Context menu item for activating manual element picker mode"
+  },
   "contextCopySelection": {
     "message": "चयन को मार्कडाउन के रूप में कॉपी करें",
     "description": "Context menu item"
@@ -222,6 +226,22 @@
   "popupDownloadBtn": {
     "message": "डाउनलोड करें",
     "description": "Button label"
+  },
+  "popupPickElementBtn": {
+    "message": "एलिमेंट चुनें",
+    "description": "Button label for activating manual element picker mode"
+  },
+  "popupPickElementStarting": {
+    "message": "पेज पर चुना जा रहा है...",
+    "description": "Temporary popup feedback after activating element picker mode"
+  },
+  "popupPickElementFailed": {
+    "message": "चुनाव विफल",
+    "description": "Temporary popup feedback when element picker activation fails"
+  },
+  "popupAlertFailedToActivateElementPicker": {
+    "message": "एलिमेंट पिकर सक्रिय नहीं हो सका। कृपया पुनः प्रयास करें।",
+    "description": "Alert shown when element picker mode cannot be activated"
   },
   "popupExportArrowTitle": {
     "message": "अधिक एक्सपोर्ट विकल्प",
@@ -874,6 +894,54 @@
   "optionsMaxUrlLengthLabel": {
     "message": "अधिकतम URL लंबाई",
     "description": "Input label"
+  },
+  "optionsSubgroupFilenameTemplates": {
+    "message": "फ़ाइलनाम टेम्पलेट",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupContentTemplates": {
+    "message": "सामग्री टेम्पलेट",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupThemeColors": {
+    "message": "थीम और रंग",
+    "description": "Subgroup label — Appearance section"
+  },
+  "optionsSubgroupPopupMenus": {
+    "message": "Popup और मेनू",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupDownloads": {
+    "message": "Downloads",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupAssistantIntegration": {
+    "message": "असिस्टेंट इंटीग्रेशन",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupBlockElements": {
+    "message": "ब्लॉक एलिमेंट",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupInlineFormatting": {
+    "message": "इनलाइन फॉर्मेटिंग",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupLinks": {
+    "message": "लिंक",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupImages": {
+    "message": "इमेज",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupContentFiltering": {
+    "message": "कंटेंट फ़िल्टरिंग",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupDataTransfer": {
+    "message": "डेटा ट्रांसफर",
+    "description": "Subgroup label — Import / Export section"
   },
   "optionsObsidianIntegrationTitle": {
     "message": "Obsidian इंटीग्रेशन",
@@ -3524,5 +3592,61 @@
   "optionsAppearanceLanguageItalian": {
     "message": "Italiano",
     "description": "Label for the Italian language option"
+  },
+  "elementPickerTitle": {
+    "message": "एलिमेंट पिकर",
+    "description": "Title for in-page element picker overlay"
+  },
+  "elementPickerHoverInfo": {
+    "message": "Markdown में बदलने के लिए किसी एलिमेंट पर माउस ले जाएं और क्लिक करें।",
+    "description": "Instruction text for element picker overlay"
+  },
+  "elementPickerSelectedPrefix": {
+    "message": "चुना गया: ",
+    "description": "Prefix before selected element label in element picker overlay"
+  },
+  "elementPickerParentBtn": {
+    "message": "पैरेंट",
+    "description": "Element picker button for selecting parent element"
+  },
+  "elementPickerChildBtn": {
+    "message": "चाइल्ड",
+    "description": "Element picker button for selecting child element"
+  },
+  "elementPickerReselectBtn": {
+    "message": "दोबारा चुनें",
+    "description": "Element picker button for clearing current selection"
+  },
+  "elementPickerCancelBtn": {
+    "message": "रद्द करें",
+    "description": "Element picker cancel button"
+  },
+  "elementPickerDoneBtn": {
+    "message": "हो गया",
+    "description": "Element picker done button"
+  },
+  "elementPickerUnknownElement": {
+    "message": "एलिमेंट",
+    "description": "Fallback element label for element picker"
+  },
+  "elementPickerConverting": {
+    "message": "चुने गए एलिमेंट को बदला जा रहा है...",
+    "description": "Element picker status while conversion is running"
+  },
+  "elementPickerEmptyError": {
+    "message": "चुने गए एलिमेंट में कोई परिवर्तनीय सामग्री नहीं है।",
+    "description": "Element picker error when selected element has no content"
+  },
+  "elementPickerFailedError": {
+    "message": "एलिमेंट रूपांतरण विफल।",
+    "description": "Element picker generic conversion error"
+  },
+  "elementPickerSuccess": {
+    "message": "एलिमेंट बदला गया। समीक्षा के लिए MarkSnip खोलें।",
+    "description": "Element picker success notification"
+  },
+  "elementPickerCopySuccess": {
+    "message": "एलिमेंट Markdown क्लिपबोर्ड में कॉपी कर दिया गया।",
+    "description": "Element picker success notification when Done copies Markdown directly"
   }
 }

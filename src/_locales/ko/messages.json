@@ -71,6 +71,10 @@
     "message": "선택 영역을 마크다운으로 다운로드",
     "description": "Context menu item"
   },
+  "contextPickElement": {
+    "message": "Markdown용 요소 선택",
+    "description": "Context menu item for activating manual element picker mode"
+  },
   "contextCopySelection": {
     "message": "선택 영역을 마크다운으로 복사",
     "description": "Context menu item"
@@ -222,6 +226,22 @@
   "popupDownloadBtn": {
     "message": "다운로드",
     "description": "Button label"
+  },
+  "popupPickElementBtn": {
+    "message": "요소 선택",
+    "description": "Button label for activating manual element picker mode"
+  },
+  "popupPickElementStarting": {
+    "message": "페이지에서 선택 중...",
+    "description": "Temporary popup feedback after activating element picker mode"
+  },
+  "popupPickElementFailed": {
+    "message": "선택 실패",
+    "description": "Temporary popup feedback when element picker activation fails"
+  },
+  "popupAlertFailedToActivateElementPicker": {
+    "message": "요소 선택기를 활성화할 수 없습니다. 다시 시도해 주세요.",
+    "description": "Alert shown when element picker mode cannot be activated"
   },
   "popupExportArrowTitle": {
     "message": "추가 내보내기 옵션",
@@ -874,6 +894,54 @@
   "optionsMaxUrlLengthLabel": {
     "message": "최대 URL 길이",
     "description": "Input label"
+  },
+  "optionsSubgroupFilenameTemplates": {
+    "message": "파일명 템플릿",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupContentTemplates": {
+    "message": "콘텐츠 템플릿",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupThemeColors": {
+    "message": "테마 및 색상",
+    "description": "Subgroup label — Appearance section"
+  },
+  "optionsSubgroupPopupMenus": {
+    "message": "Popup 및 메뉴",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupDownloads": {
+    "message": "다운로드",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupAssistantIntegration": {
+    "message": "어시스턴트 연동",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupBlockElements": {
+    "message": "블록 요소",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupInlineFormatting": {
+    "message": "인라인 서식",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupLinks": {
+    "message": "링크",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupImages": {
+    "message": "이미지",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupContentFiltering": {
+    "message": "콘텐츠 필터링",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupDataTransfer": {
+    "message": "데이터 전송",
+    "description": "Subgroup label — Import / Export section"
   },
   "optionsObsidianIntegrationTitle": {
     "message": "Obsidian 통합",
@@ -3524,5 +3592,61 @@
   "optionsAppearanceLanguageItalian": {
     "message": "Italiano",
     "description": "Label for the Italian language option"
+  },
+  "elementPickerTitle": {
+    "message": "요소 선택기",
+    "description": "Title for in-page element picker overlay"
+  },
+  "elementPickerHoverInfo": {
+    "message": "요소 위에 마우스를 올리고 클릭하면 Markdown으로 변환됩니다.",
+    "description": "Instruction text for element picker overlay"
+  },
+  "elementPickerSelectedPrefix": {
+    "message": "선택됨: ",
+    "description": "Prefix before selected element label in element picker overlay"
+  },
+  "elementPickerParentBtn": {
+    "message": "부모",
+    "description": "Element picker button for selecting parent element"
+  },
+  "elementPickerChildBtn": {
+    "message": "자식",
+    "description": "Element picker button for selecting child element"
+  },
+  "elementPickerReselectBtn": {
+    "message": "다시 선택",
+    "description": "Element picker button for clearing current selection"
+  },
+  "elementPickerCancelBtn": {
+    "message": "취소",
+    "description": "Element picker cancel button"
+  },
+  "elementPickerDoneBtn": {
+    "message": "완료",
+    "description": "Element picker done button"
+  },
+  "elementPickerUnknownElement": {
+    "message": "요소",
+    "description": "Fallback element label for element picker"
+  },
+  "elementPickerConverting": {
+    "message": "선택한 요소를 변환 중...",
+    "description": "Element picker status while conversion is running"
+  },
+  "elementPickerEmptyError": {
+    "message": "선택한 요소에 변환 가능한 콘텐츠가 없습니다.",
+    "description": "Element picker error when selected element has no content"
+  },
+  "elementPickerFailedError": {
+    "message": "요소 변환에 실패했습니다.",
+    "description": "Element picker generic conversion error"
+  },
+  "elementPickerSuccess": {
+    "message": "요소가 변환되었습니다. MarkSnip을 열어 확인하세요.",
+    "description": "Element picker success notification"
+  },
+  "elementPickerCopySuccess": {
+    "message": "요소 Markdown이 클립보드에 복사되었습니다.",
+    "description": "Element picker success notification when Done copies Markdown directly"
   }
 }

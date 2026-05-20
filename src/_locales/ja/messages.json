@@ -71,6 +71,10 @@
     "message": "選択範囲をMarkdownとしてダウンロード",
     "description": "Context menu item"
   },
+  "contextPickElement": {
+    "message": "Markdownのために要素を選択",
+    "description": "Context menu item for activating manual element picker mode"
+  },
   "contextCopySelection": {
     "message": "選択範囲をMarkdownとしてコピー",
     "description": "Context menu item"
@@ -222,6 +226,22 @@
   "popupDownloadBtn": {
     "message": "ダウンロード",
     "description": "Button label"
+  },
+  "popupPickElementBtn": {
+    "message": "要素を選択",
+    "description": "Button label for activating manual element picker mode"
+  },
+  "popupPickElementStarting": {
+    "message": "ページ上で選択中...",
+    "description": "Temporary popup feedback after activating element picker mode"
+  },
+  "popupPickElementFailed": {
+    "message": "選択に失敗しました",
+    "description": "Temporary popup feedback when element picker activation fails"
+  },
+  "popupAlertFailedToActivateElementPicker": {
+    "message": "要素ピッカーを起動できませんでした。もう一度お試しください。",
+    "description": "Alert shown when element picker mode cannot be activated"
   },
   "popupExportArrowTitle": {
     "message": "その他のエクスポートオプション",
@@ -874,6 +894,54 @@
   "optionsMaxUrlLengthLabel": {
     "message": "最大URL長",
     "description": "Input label"
+  },
+  "optionsSubgroupFilenameTemplates": {
+    "message": "ファイル名テンプレート",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupContentTemplates": {
+    "message": "コンテンツテンプレート",
+    "description": "Subgroup label — Templates section"
+  },
+  "optionsSubgroupThemeColors": {
+    "message": "テーマとカラー",
+    "description": "Subgroup label — Appearance section"
+  },
+  "optionsSubgroupPopupMenus": {
+    "message": "Popupとメニュー",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupDownloads": {
+    "message": "ダウンロード",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupAssistantIntegration": {
+    "message": "アシスタント連携",
+    "description": "Subgroup label — Exports & Integrations section"
+  },
+  "optionsSubgroupBlockElements": {
+    "message": "ブロック要素",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupInlineFormatting": {
+    "message": "インライン書式",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupLinks": {
+    "message": "リンク",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupImages": {
+    "message": "画像",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupContentFiltering": {
+    "message": "コンテンツフィルタリング",
+    "description": "Subgroup label — Markdown section"
+  },
+  "optionsSubgroupDataTransfer": {
+    "message": "データ転送",
+    "description": "Subgroup label — Import / Export section"
   },
   "optionsObsidianIntegrationTitle": {
     "message": "Obsidian 統合",
@@ -3524,5 +3592,61 @@
   "optionsAppearanceLanguageItalian": {
     "message": "Italiano",
     "description": "Label for the Italian language option"
+  },
+  "elementPickerTitle": {
+    "message": "要素ピッカー",
+    "description": "Title for in-page element picker overlay"
+  },
+  "elementPickerHoverInfo": {
+    "message": "要素にカーソルを合わせてクリックすると、Markdownに変換されます。",
+    "description": "Instruction text for element picker overlay"
+  },
+  "elementPickerSelectedPrefix": {
+    "message": "選択済み: ",
+    "description": "Prefix before selected element label in element picker overlay"
+  },
+  "elementPickerParentBtn": {
+    "message": "親要素",
+    "description": "Element picker button for selecting parent element"
+  },
+  "elementPickerChildBtn": {
+    "message": "子要素",
+    "description": "Element picker button for selecting child element"
+  },
+  "elementPickerReselectBtn": {
+    "message": "再選択",
+    "description": "Element picker button for clearing current selection"
+  },
+  "elementPickerCancelBtn": {
+    "message": "キャンセル",
+    "description": "Element picker cancel button"
+  },
+  "elementPickerDoneBtn": {
+    "message": "完了",
+    "description": "Element picker done button"
+  },
+  "elementPickerUnknownElement": {
+    "message": "要素",
+    "description": "Fallback element label for element picker"
+  },
+  "elementPickerConverting": {
+    "message": "選択した要素を変換中...",
+    "description": "Element picker status while conversion is running"
+  },
+  "elementPickerEmptyError": {
+    "message": "選択した要素に変換可能なコンテンツが含まれていません。",
+    "description": "Element picker error when selected element has no content"
+  },
+  "elementPickerFailedError": {
+    "message": "要素の変換に失敗しました。",
+    "description": "Element picker generic conversion error"
+  },
+  "elementPickerSuccess": {
+    "message": "要素を変換しました。MarkSnipを開いて確認してください。",
+    "description": "Element picker success notification"
+  },
+  "elementPickerCopySuccess": {
+    "message": "要素のMarkdownをクリップボードにコピーしました。",
+    "description": "Element picker success notification when Done copies Markdown directly"
   }
 }
