@@ -98,17 +98,6 @@ function normalizeContextMenuItemsState(contextMenuItems) {
     }, {});
 }
 
-function getContextMenuItemsFromControls() {
-    const currentItems = normalizeContextMenuItemsState(options.contextMenuItems);
-    document.querySelectorAll("input[name^='contextMenuItems.']").forEach((input) => {
-        const itemKey = input.name.split('.')[1];
-        if (itemKey) {
-            currentItems[itemKey] = input.checked;
-        }
-    });
-    return normalizeContextMenuItemsState(currentItems);
-}
-
 function setContextMenuItemControls(contextMenuItems) {
     const normalizedItems = normalizeContextMenuItemsState(contextMenuItems);
     document.querySelectorAll("input[name^='contextMenuItems.']").forEach((input) => {
@@ -2016,85 +2005,6 @@ function configureReviewLink() {
 
     reviewLink.href = isFirefox ? firefoxUrl : chromeUrl;
 }
-
-
-const saveOptions = e => {
-    e.preventDefault();
-
-    const customSendToTargets = normalizeCustomSendToTargetsState(options.sendToCustomTargets);
-    options = {
-        frontmatter: document.querySelector("[name='frontmatter']").value,
-        backmatter: document.querySelector("[name='backmatter']").value,
-        title: document.querySelector("[name='title']").value,
-        disallowedChars: document.querySelector("[name='disallowedChars']").value,
-        disallowedCharReplacement: document.querySelector("[name='disallowedCharReplacement']").value,
-        includeTemplate: document.querySelector("[name='includeTemplate']").checked,
-        saveAs: document.querySelector("[name='saveAs']").checked,
-        downloadImages: document.querySelector("[name='downloadImages']").checked,
-        imagePrefix: document.querySelector("[name='imagePrefix']").value,
-        mdClipsFolder: document.querySelector("[name='mdClipsFolder']").value,
-        defaultExportType: getCheckedValue(document.querySelectorAll("input[name='defaultExportType']")) || 'markdown',
-        defaultSendToTarget: normalizeDefaultSendToTargetState(
-            getCheckedValue(document.querySelectorAll("input[name='defaultSendToTarget']")) || DEFAULT_SEND_TO_TARGET,
-            customSendToTargets
-        ),
-        sendToCustomTargets: customSendToTargets,
-        sendToMaxUrlLength: normalizeSendToMaxUrlLengthState(
-            document.querySelector("[name='sendToMaxUrlLength']")?.value,
-            defaultOptions?.sendToMaxUrlLength
-        ),
-        webhookTargets: getNormalizedWebhookTargets(),
-        turndownEscape: document.querySelector("[name='turndownEscape']").checked,
-	        skipHiddenContent: document.querySelector("[name='skipHiddenContent']").checked,
-	        hashtagHandling: getCheckedValue(document.querySelectorAll("input[name='hashtagHandling']")),
-	        contextMenus: document.querySelector("[name='contextMenus']").checked,
-	        contextMenuItems: getContextMenuItemsFromControls(),
-	        batchProcessingEnabled: document.querySelector("[name='batchProcessingEnabled']").checked,
-        obsidianIntegration: document.querySelector("[name='obsidianIntegration']").checked,
-        obsidianVault: document.querySelector("[name='obsidianVault']").value,
-        obsidianFolder: document.querySelector("[name='obsidianFolder']").value,
-
-        preserveCodeFormatting: document.querySelector("[name='preserveCodeFormatting']").checked,
-        autoDetectCodeLanguage: document.querySelector("[name='autoDetectCodeLanguage']").checked,
-
-        // Add table formatting options
-        tableFormatting: {
-            stripLinks: document.querySelector("[name='tableFormatting.stripLinks']").checked,
-            stripFormatting: document.querySelector("[name='tableFormatting.stripFormatting']").checked,
-            prettyPrint: document.querySelector("[name='tableFormatting.prettyPrint']").checked,
-            centerText: document.querySelector("[name='tableFormatting.centerText']").checked
-        },
-
-        headingStyle: getCheckedValue(document.querySelectorAll("input[name='headingStyle']")),
-        hr: getCheckedValue(document.querySelectorAll("input[name='hr']")),
-        bulletListMarker: getCheckedValue(document.querySelectorAll("input[name='bulletListMarker']")),
-        codeBlockStyle: getCheckedValue(document.querySelectorAll("input[name='codeBlockStyle']")),
-        fence: getCheckedValue(document.querySelectorAll("input[name='fence']")),
-        emDelimiter: getCheckedValue(document.querySelectorAll("input[name='emDelimiter']")),
-        strongDelimiter: getCheckedValue(document.querySelectorAll("input[name='strongDelimiter']")),
-        linkStyle: getCheckedValue(document.querySelectorAll("input[name='linkStyle']")),
-        linkReferenceStyle: getCheckedValue(document.querySelectorAll("input[name='linkReferenceStyle']")),
-        imageStyle: getCheckedValue(document.querySelectorAll("input[name='imageStyle']")),
-        imageRefStyle: getCheckedValue(document.querySelectorAll("input[name='imageRefStyle']")),
-        downloadMode: getCheckedValue(document.querySelectorAll("input[name='downloadMode']")),
-        popupTheme: getCheckedValue(document.querySelectorAll("input[name='popupTheme']")),
-        specialTheme: getCheckedValue(document.querySelectorAll("input[name='specialTheme']")) || 'none',
-        colorBlindTheme: normalizeColorBlindTheme(document.querySelector("[name='colorBlindTheme']")?.value),
-        specialThemeIcon: document.querySelector("[name='specialThemeIcon']").checked,
-	        popupAccent: getCheckedValue(document.querySelectorAll("input[name='popupAccent']")),
-	        compactMode: document.querySelector("[name='compactMode']").checked,
-	        elementPickerEnabled: document.querySelector("[name='elementPickerEnabled']").checked,
-	        elementPickerDoneAction: getCheckedValue(document.querySelectorAll("input[name='elementPickerDoneAction']")) || 'popup',
-	        showThemeToggleInPopup: document.querySelector("[name='showThemeToggleInPopup']").checked,
-	        showUserGuideIcon: document.querySelector("[name='showUserGuideIcon']").checked,
-	        editorTheme: getCheckedValue(document.querySelectorAll("input[name='editorTheme']")),
-	        uiLanguage: getCheckedValue(document.querySelectorAll("input[name='uiLanguage']")) || 'auto',
-	        siteRules: normalizeSiteRulesState(options.siteRules),
-	    }
-
-    save();
-}
-
 const save = (feedback = { message: optionsMessage('optionsSavedToast', null, "Options Saved 💾"), type: "success" }) => {
 	    const spinner = document.getElementById("spinner");
 	    spinner.style.display = "block";
@@ -3065,14 +2975,12 @@ function initSearch() {
             item.setAttribute('aria-selected', String(isActive));
             item.tabIndex = isActive ? 0 : -1;
         });
-        const activeItem = document.querySelector(`.sidebar-item[data-section="${activeTab}"]`);
 
         allSections.forEach(section => {
             const isActive = section.id === `section-${activeTab}`;
             section.classList.toggle('active', isActive);
             section.setAttribute('aria-hidden', String(!isActive));
         });
-        const activeSection = document.getElementById(`section-${activeTab}`);
 
         refreshElements();
     }
@@ -3181,157 +3089,8 @@ function initSearch() {
     });
 }
 
-function initSearchLegacy() {
-    const searchInput = document.getElementById('settings-search');
-    const contentPanel = document.querySelector('.content-panel');
-    const noResults = document.getElementById('search-no-results');
-    const noResultsQuery = document.getElementById('search-no-results-query');
-    const shortcutHint = document.getElementById('search-shortcut-hint');
-
-    // Build search index: collect all setting-cards with their searchable text
-    // Also include the downloadModeGroup's inner cards as individual entries
-    const sections = document.querySelectorAll('.section');
-    const searchIndex = [];
-
-    sections.forEach(section => {
-        // Get direct setting-cards and also cards inside #downloadModeGroup
-        const cards = section.querySelectorAll('.setting-card');
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            searchIndex.push({ card, section, text });
-        });
-    });
-
-    let searchTimeout = null;
-
-    function performSearch(query) {
-        query = query.trim().toLowerCase();
-
-        if (!query) {
-            // Exit search mode — restore normal sidebar navigation
-            contentPanel.classList.remove('search-active');
-            noResults.classList.remove('visible');
-            searchIndex.forEach(({ card }) => {
-                card.classList.remove('search-hidden', 'search-match');
-                card.style.removeProperty('display');
-                card.style.removeProperty('opacity');
-            });
-            // Also restore parent wrappers that may have been force-shown
-            document.querySelectorAll('[data-search-force-shown]').forEach(el => {
-                el.removeAttribute('data-search-force-shown');
-            });
-            sections.forEach(s => s.classList.remove('search-section-empty'));
-            // Re-trigger sidebar to show correct section
-            const activeTab = sessionStorage.getItem('marksnip-options-tab') || 'templates';
-            const sidebarItems = document.querySelectorAll('.sidebar-item');
-            const allSections = document.querySelectorAll('.section');
-            sidebarItems.forEach(item => item.classList.remove('active'));
-            const activeItem = document.querySelector(`.sidebar-item[data-section="${activeTab}"]`);
-            if (activeItem) activeItem.classList.add('active');
-            allSections.forEach(s => s.classList.remove('active'));
-            const activeSection = document.getElementById(`section-${activeTab}`);
-            if (activeSection) activeSection.classList.add('active');
-            // Restore conditional visibility
-            refreshElements();
-            return;
-        }
-
-        // Enter search mode
-        contentPanel.classList.add('search-active');
-
-        const terms = query.split(/\s+/).filter(Boolean);
-        let totalMatches = 0;
-
-        searchIndex.forEach(({ card, text }) => {
-            const matches = terms.every(term => text.includes(term));
-            card.classList.toggle('search-hidden', !matches);
-            card.classList.toggle('search-match', matches);
-            if (matches) {
-                totalMatches++;
-                // Override any inline display:none from show() / refreshElements()
-                card.style.display = '';
-                card.style.opacity = '1';
-                // Force-show any conditionally hidden children so they are interactable in search results
-                card.querySelectorAll('[data-search-reveal]').forEach(child => {
-                    if (child.style.display === 'none') {
-                        child.style.display = '';
-                        child.style.opacity = '1';
-                        child.setAttribute('data-search-force-shown', '');
-                    }
-                });
-                // Also ensure parent wrappers (like #downloadModeGroup) are visible
-                let parent = card.parentElement;
-                while (parent && parent !== contentPanel) {
-                    if (parent.style.display === 'none') {
-                        parent.style.display = '';
-                        parent.style.opacity = '1';
-                        parent.setAttribute('data-search-force-shown', '');
-                    }
-                    parent = parent.parentElement;
-                }
-            }
-        });
-
-        // Mark sections that have zero visible cards
-        sections.forEach(section => {
-            const hasVisible = section.querySelector('.setting-card.search-match');
-            section.classList.toggle('search-section-empty', !hasVisible);
-        });
-
-        // Show/hide no-results message
-        if (totalMatches === 0) {
-            noResultsQuery.textContent = query;
-            noResults.classList.add('visible');
-        } else {
-            noResults.classList.remove('visible');
-        }
-    }
-
-    searchInput.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => performSearch(searchInput.value), 150);
-    });
-
-    // "/" keyboard shortcut to focus search
-    document.addEventListener('keydown', (e) => {
-        if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-            const tag = document.activeElement?.tagName;
-            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-            e.preventDefault();
-            searchInput.focus();
-        }
-        // Escape to clear search
-        if (e.key === 'Escape' && document.activeElement === searchInput) {
-            searchInput.value = '';
-            performSearch('');
-            searchInput.blur();
-        }
-    });
-}
-
 document.addEventListener("DOMContentLoaded", loaded);
 document.getElementById("status").addEventListener("click", hideToast);
-
-/// https://www.somacon.com/p143.php
-// return the value of the radio button that is checked
-// return an empty string if none are checked, or
-// there are no radio buttons
-function getCheckedValue(radioObj) {
-    if (!radioObj)
-        return "";
-    var radioLength = radioObj.length;
-    if (radioLength == undefined)
-        if (radioObj.checked)
-            return radioObj.value;
-        else
-            return "";
-    for (var i = 0; i < radioLength; i++) {
-        if (radioObj[i].checked) {
-            return radioObj[i].value;
-        }
-    }
-    return "";
-}
 
 // set the radio button with the given value as being checked
 // do nothing if there are no radio buttons
