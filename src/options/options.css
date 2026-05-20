@@ -2273,6 +2273,15 @@ a:hover {
     color: var(--accent-dark);
 }
 
+.special-theme-disclaimer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-light);
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+    line-height: 1.5;
+}
+
 .reset-setting-link {
     font-size: var(--text-xs);
     color: var(--text-tertiary);
