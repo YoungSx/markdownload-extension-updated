@@ -1261,8 +1261,7 @@ body {
 }
 
 .toggle-row.is-picker-hidden {
-    grid-template-columns: max-content 1px max-content;
-    justify-content: start;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
 }
 
 .quick-option {
