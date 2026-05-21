@@ -1,18 +1,18 @@
 {
   "clickClipBulkBtn": {
-    "message": "Add all in a container",
+    "message": "Ajouter tout dans un conteneur",
     "description": "Button that starts container bulk-selection of triggers"
   },
   "clickClipBulkPrompt": {
-    "message": "Click a container to tag all buttons inside it.",
+    "message": "Cliquez sur un conteneur pour marquer tous les boutons qu'il contient.",
     "description": "Prompt shown while bulk-selection mode is armed"
   },
   "clickClipBulkNone": {
-    "message": "No buttons found in that container.",
+    "message": "Aucun bouton trouvé dans ce conteneur.",
     "description": "Shown when bulk-selection finds no clickable elements"
   },
   "popupAlertFailedToActivateClickClip": {
-    "message": "Failed to activate Click & Clip. Please try again.",
+    "message": "Impossible d'activer Click & Clip. Veuillez réessayer.",
     "description": "Alert message when Click & Clip fails to activate"
   },
   "clickClipTitle": {
@@ -20,15 +20,15 @@
     "description": "Title for the in-page Click & Clip picker panel"
   },
   "clickClipWarning": {
-    "message": "Clicks the buttons you tag. Avoid pages where clicking submits forms or makes purchases.",
+    "message": "Clique sur les boutons que vous avez marqués. Évitez les pages où les clics soumettent des formulaires ou effectuent des achats.",
     "description": "Safety warning shown in the Click & Clip panel"
   },
   "clickClipPickInfo": {
-    "message": "Click buttons/tabs on the page to tag them.",
+    "message": "Cliquez sur des boutons/onglets de la page pour les marquer.",
     "description": "Instruction shown before any triggers are tagged"
   },
   "clickClipTaggedCount": {
-    "message": "$COUNT$ button(s) tagged",
+    "message": "$COUNT$ bouton(s) marqué(s)",
     "description": "Count of tagged trigger buttons",
     "placeholders": {
       "count": {
@@ -37,23 +37,23 @@
     }
   },
   "clickClipPatternLabel": {
-    "message": "Pattern",
+    "message": "Modèle",
     "description": "Label for the interaction-pattern selector"
   },
   "clickClipPatternAuto": {
-    "message": "Auto-detect",
+    "message": "Détection automatique",
     "description": "Pattern option: automatically detect the interaction pattern"
   },
   "clickClipPatternTabs": {
-    "message": "Tabs / panels",
+    "message": "Onglets / panneaux",
     "description": "Pattern option: tabbed content"
   },
   "clickClipPatternAccordion": {
-    "message": "Accordion",
+    "message": "Accordéon",
     "description": "Pattern option: accordion / expandable sections"
   },
   "clickClipPatternLoadMore": {
-    "message": "Load more",
+    "message": "Charger plus",
     "description": "Pattern option: a load-more button clicked repeatedly"
   },
   "clickClipPatternPagination": {
@@ -61,51 +61,51 @@
     "description": "Pattern option: next-page pagination"
   },
   "clickClipOutputLabel": {
-    "message": "Output",
+    "message": "Sortie",
     "description": "Label for the output-mode selector"
   },
   "clickClipOutputFiles": {
-    "message": "File per button",
+    "message": "Fichier par bouton",
     "description": "Output option: one markdown file per button"
   },
   "clickClipOutputCombined": {
-    "message": "Combined doc",
+    "message": "Document combiné",
     "description": "Output option: a single combined markdown document"
   },
   "clickClipCancelBtn": {
-    "message": "Cancel",
+    "message": "Annuler",
     "description": "Click & Clip cancel button"
   },
   "clickClipTestBtn": {
-    "message": "Test first",
+    "message": "Tester d'abord",
     "description": "Click & Clip button that dry-runs the first trigger"
   },
   "clickClipStartBtn": {
-    "message": "Start",
+    "message": "Démarrer",
     "description": "Click & Clip button that starts the run"
   },
   "clickClipMoveUp": {
-    "message": "Move up",
+    "message": "Monter",
     "description": "Tooltip for moving a trigger up in the list"
   },
   "clickClipMoveDown": {
-    "message": "Move down",
+    "message": "Descendre",
     "description": "Tooltip for moving a trigger down in the list"
   },
   "clickClipRemove": {
-    "message": "Remove",
+    "message": "Supprimer",
     "description": "Tooltip for removing a trigger from the list"
   },
   "clickClipRejectLink": {
-    "message": "That link navigates away — use Batch Link for links.",
+    "message": "Ce lien navigue ailleurs — utilisez le traitement par lots pour les liens.",
     "description": "Shown when the user tries to tag a real navigational link"
   },
   "clickClipRunning": {
-    "message": "Running…",
+    "message": "En cours…",
     "description": "Status while the Click & Clip run is in progress"
   },
   "clickClipRunningItem": {
-    "message": "Processing $CURRENT$ of $TOTAL$…",
+    "message": "Traitement de $CURRENT$ sur $TOTAL$…",
     "description": "Per-item progress during a Click & Clip run",
     "placeholders": {
       "current": {
@@ -117,7 +117,7 @@
     }
   },
   "clickClipRunningLoadMore": {
-    "message": "Loaded $COUNT$ time(s)…",
+    "message": "Chargé $COUNT$ fois…",
     "description": "Progress for the load-more pattern",
     "placeholders": {
       "count": {
@@ -126,7 +126,7 @@
     }
   },
   "clickClipRunningPage": {
-    "message": "Captured page $PAGE$…",
+    "message": "Page $PAGE$ capturée…",
     "description": "Progress for the pagination pattern",
     "placeholders": {
       "page": {
@@ -135,15 +135,15 @@
     }
   },
   "clickClipNavAborted": {
-    "message": "A click navigated away — stopping.",
+    "message": "Un clic a navigué ailleurs — arrêt en cours.",
     "description": "Shown when a click caused navigation and the run was aborted"
   },
   "clickClipFinalizing": {
-    "message": "Saving…",
+    "message": "Enregistrement…",
     "description": "Status while the captured items are being saved"
   },
   "clickClipSuccess": {
-    "message": "Done — $COUNT$ item(s) clipped.",
+    "message": "Terminé — $COUNT$ élément(s) capturé(s).",
     "description": "Success message after a Click & Clip run",
     "placeholders": {
       "count": {
@@ -152,19 +152,19 @@
     }
   },
   "clickClipNothingCaptured": {
-    "message": "Nothing was captured.",
+    "message": "Rien n'a été capturé.",
     "description": "Shown when a Click & Clip run produced no content"
   },
   "clickClipRunFailed": {
-    "message": "Click & Clip failed. See console.",
+    "message": "Click & Clip a échoué. Voir la console.",
     "description": "Shown when a Click & Clip run fails"
   },
   "clickClipTesting": {
-    "message": "Testing first button…",
+    "message": "Test du premier bouton…",
     "description": "Status during the Test-first dry run"
   },
   "clickClipTestResult": {
-    "message": "Ready to clip this page state ($COUNT$ characters).",
+    "message": "Prêt à capturer cet état de page ($COUNT$ caractères).",
     "description": "Result of the Test-first page-state dry run",
     "placeholders": {
       "count": {
@@ -173,7 +173,7 @@
     }
   },
   "clickClipTestNoRegion": {
-    "message": "Unable to capture the page state for the first button.",
+    "message": "Impossible de capturer l'état de la page pour le premier bouton.",
     "description": "Shown when the Test-first dry run cannot capture the page state"
   },
   "extensionName": {
@@ -493,147 +493,147 @@
     "description": "Button label"
   },
   "popupBatchSubtitle": {
-    "message": "Extract content from multiple sources at once.",
+    "message": "Extrayez du contenu depuis plusieurs sources à la fois.",
     "description": "Subtitle for the batch processing view"
   },
   "popupBatchCloseAria": {
-    "message": "Close Batch Processing",
+    "message": "Fermer le traitement par lots",
     "description": "ARIA label for closing the batch processing view"
   },
   "popupBatchCaptureMethodTitle": {
-    "message": "Capture Method",
+    "message": "Méthode de capture",
     "description": "Title for the batch capture method step"
   },
   "popupBatchCaptureMethodDesc": {
-    "message": "Choose how you want to provide the sources.",
+    "message": "Choisissez comment vous souhaitez fournir les sources.",
     "description": "Description for the batch capture method step"
   },
   "popupBatchCaptureMethodAria": {
-    "message": "Capture method",
+    "message": "Méthode de capture",
     "description": "ARIA label for the batch capture method selector"
   },
   "popupBatchManualTitle": {
-    "message": "URL Input",
+    "message": "Saisie d'URL",
     "description": "Batch capture method option title for manual URL entry"
   },
   "popupBatchManualDesc": {
-    "message": "Type or paste URLs manually",
+    "message": "Saisissez ou collez des URL manuellement",
     "description": "Batch capture method option description for manual URL entry"
   },
   "popupBatchPickTitle": {
-    "message": "Pick Links",
+    "message": "Sélectionner des liens",
     "description": "Batch capture method option title for picking links from the page"
   },
   "popupBatchPickDesc": {
-    "message": "Extract links from this page",
+    "message": "Extraire les liens de cette page",
     "description": "Batch capture method option description for picking links from the page"
   },
   "popupBatchClickDesc": {
-    "message": "Click elements to extract",
+    "message": "Cliquer sur des éléments pour extraire",
     "description": "Batch capture method option description for Click & Clip"
   },
   "popupBatchStepUrlsTitle": {
-    "message": "URLs",
+    "message": "URL",
     "description": "Title for the manual URL input step"
   },
   "popupBatchStepUrlsHint": {
-    "message": "One per line",
+    "message": "Une par ligne",
     "description": "Hint for the manual URL input step"
   },
   "popupBatchUrlsAria": {
-    "message": "URLs to convert, one per line",
+    "message": "URL à convertir, une par ligne",
     "description": "ARIA label for the batch URLs textarea"
   },
   "popupBatchPickCurrentPageBtn": {
-    "message": "Pick Links from Current Page",
+    "message": "Sélectionner les liens de la page actuelle",
     "description": "Button label for activating the link picker from batch mode"
   },
   "popupBatchPickNote": {
-    "message": "Links will be gathered from the active tab.",
+    "message": "Les liens seront collectés depuis l'onglet actif.",
     "description": "Note explaining where picked batch links come from"
   },
   "popupBatchNoLinksTitle": {
-    "message": "No links selected yet",
+    "message": "Aucun lien sélectionné pour l'instant",
     "description": "Empty state title for picked batch links"
   },
   "popupBatchNoLinksText": {
-    "message": "Your selected links will appear here.",
+    "message": "Les liens sélectionnés apparaîtront ici.",
     "description": "Empty state text for picked batch links"
   },
   "popupBatchClickPanelTitle": {
-    "message": "Click & Clip runs on the page",
+    "message": "Click & Clip s'exécute sur la page",
     "description": "Title for the batch Click & Clip explanation panel"
   },
   "popupBatchClickPanelDesc": {
-    "message": "When you start, the element picker opens on the active tab. Click elements to queue them, then finish from the in-page panel.",
+    "message": "Au démarrage, le sélecteur d'éléments s'ouvre dans l'onglet actif. Cliquez sur les éléments pour les mettre en file d'attente, puis terminez depuis le panneau de la page.",
     "description": "Description for the batch Click & Clip explanation panel"
   },
   "popupBatchOutputFormatTitle": {
-    "message": "Output Format",
+    "message": "Format de sortie",
     "description": "Title for the batch output format step"
   },
   "popupBatchOutputFormatDesc": {
-    "message": "Choose how the results should be saved.",
+    "message": "Choisissez comment les résultats doivent être enregistrés.",
     "description": "Description for the batch output format step"
   },
   "popupBatchOutputFormatAria": {
-    "message": "Output format",
+    "message": "Format de sortie",
     "description": "ARIA label for the batch output format selector"
   },
   "popupBatchOutputZipTitle": {
-    "message": "ZIP Archive",
+    "message": "Archive ZIP",
     "description": "Batch output option title for ZIP archive"
   },
   "popupBatchOutputZipDesc": {
-    "message": "All results in a single .zip file",
+    "message": "Tous les résultats dans un seul fichier .zip",
     "description": "Batch output option description for ZIP archive"
   },
   "popupBatchOutputIndividualTitle": {
-    "message": "Individual .md Files",
+    "message": "Fichiers .md individuels",
     "description": "Batch output option title for individual Markdown files"
   },
   "popupBatchOutputIndividualDesc": {
-    "message": "One Markdown file per source",
+    "message": "Un fichier Markdown par source",
     "description": "Batch output option description for individual Markdown files"
   },
   "popupBatchOutputCombinedTitle": {
-    "message": "Combined .md File",
+    "message": "Fichier .md combiné",
     "description": "Batch output option title for a combined Markdown file"
   },
   "popupBatchOutputCombinedDesc": {
-    "message": "All results in one Markdown file",
+    "message": "Tous les résultats dans un seul fichier Markdown",
     "description": "Batch output option description for a combined Markdown file"
   },
   "popupBatchStartProcessingBtn": {
-    "message": "Start Batch Processing",
+    "message": "Démarrer le traitement par lots",
     "description": "Button label for starting a batch URL or picked-links run"
   },
   "popupBatchStepLinksTitle": {
-    "message": "Links to Capture",
+    "message": "Liens à capturer",
     "description": "Title for the picked links step"
   },
   "popupBatchStepLinksDesc": {
-    "message": "Collect links from the current page and add them to the batch list.",
+    "message": "Collectez les liens de la page actuelle et ajoutez-les à la liste de traitement par lots.",
     "description": "Description for the picked links step"
   },
   "popupBatchStepElementsTitle": {
-    "message": "Elements to Capture",
+    "message": "Éléments à capturer",
     "description": "Title for the Click & Clip step"
   },
   "popupBatchStepElementsDesc": {
-    "message": "Click & Clip runs directly on the active tab.",
+    "message": "Click & Clip s'exécute directement dans l'onglet actif.",
     "description": "Description for the Click & Clip step"
   },
   "popupBatchStartClickClipBtn": {
-    "message": "Start Click & Clip",
+    "message": "Démarrer Click & Clip",
     "description": "Button label for starting Click & Clip from batch mode"
   },
   "popupBatchLinksSelectedOne": {
-    "message": "1 link selected",
+    "message": "1 lien sélectionné",
     "description": "Picked links count when exactly one link is selected"
   },
   "popupBatchLinksSelectedMany": {
-    "message": "$COUNT$ links selected",
+    "message": "$COUNT$ liens sélectionnés",
     "description": "Picked links count when zero or many links are selected",
     "placeholders": {
       "count": {
@@ -642,43 +642,43 @@
     }
   },
   "popupBatchClearLinksBtn": {
-    "message": "Clear all",
+    "message": "Tout effacer",
     "description": "Button label for clearing picked links"
   },
   "popupBatchRemoveLinkAria": {
-    "message": "Remove link",
+    "message": "Supprimer le lien",
     "description": "ARIA label for removing a picked batch link"
   },
   "popupBatchLoadingPage": {
-    "message": "Loading page...",
+    "message": "Chargement de la page...",
     "description": "Batch progress status while loading a page"
   },
   "popupBatchConvertingPage": {
-    "message": "Converting page...",
+    "message": "Conversion de la page...",
     "description": "Batch progress status while converting a page"
   },
   "popupBatchRetryingPage": {
-    "message": "Retrying page capture...",
+    "message": "Nouvelle tentative de capture de la page...",
     "description": "Batch progress status while retrying a page capture"
   },
   "popupBatchCreatingZip": {
-    "message": "Creating ZIP archive...",
+    "message": "Création de l'archive ZIP...",
     "description": "Batch progress status while creating the ZIP archive"
   },
   "popupBatchCombining": {
-    "message": "Building combined document...",
+    "message": "Construction du document combiné...",
     "description": "Batch progress status while building a combined Markdown document"
   },
   "popupBatchWarning": {
-    "message": "Warning during conversion",
+    "message": "Avertissement lors de la conversion",
     "description": "Fallback batch warning status"
   },
   "popupBatchFailedUrl": {
-    "message": "Failed URL",
+    "message": "URL échouée",
     "description": "Fallback label for a failed batch URL"
   },
   "popupBatchItemError": {
-    "message": "Error: $ERROR$",
+    "message": "Erreur : $ERROR$",
     "description": "Batch progress status for an item error",
     "placeholders": {
       "error": {
@@ -687,15 +687,15 @@
     }
   },
   "popupBatchCancelled": {
-    "message": "Batch cancelled",
+    "message": "Traitement par lots annulé",
     "description": "Batch progress status after cancellation"
   },
   "popupBatchUnknownError": {
-    "message": "Unknown error",
+    "message": "Erreur inconnue",
     "description": "Fallback batch error text"
   },
   "popupBatchFailed": {
-    "message": "Batch failed: $ERROR$",
+    "message": "Traitement par lots échoué : $ERROR$",
     "description": "Batch progress status after failure",
     "placeholders": {
       "error": {
@@ -704,7 +704,7 @@
     }
   },
   "popupBatchFinishedWithErrors": {
-    "message": "Finished with $COUNT$ error(s)",
+    "message": "Terminé avec $COUNT$ erreur(s)",
     "description": "Batch progress status when some URLs failed",
     "placeholders": {
       "count": {
@@ -713,15 +713,15 @@
     }
   },
   "popupBatchZipDownloaded": {
-    "message": "ZIP downloaded",
+    "message": "ZIP téléchargé",
     "description": "Batch completion status for ZIP output"
   },
   "popupBatchCombinedDownloaded": {
-    "message": "Combined file downloaded",
+    "message": "Fichier combiné téléchargé",
     "description": "Batch completion status for combined Markdown output"
   },
   "popupBatchComplete": {
-    "message": "Batch complete",
+    "message": "Traitement par lots terminé",
     "description": "Batch completion status for individual file output"
   },
   "popupLibraryTitle": {

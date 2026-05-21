@@ -1,18 +1,18 @@
 {
   "clickClipBulkBtn": {
-    "message": "Add all in a container",
+    "message": "添加容器内所有项",
     "description": "Button that starts container bulk-selection of triggers"
   },
   "clickClipBulkPrompt": {
-    "message": "Click a container to tag all buttons inside it.",
+    "message": "点击容器以标记其中所有按钮。",
     "description": "Prompt shown while bulk-selection mode is armed"
   },
   "clickClipBulkNone": {
-    "message": "No buttons found in that container.",
+    "message": "在该容器中未找到按钮。",
     "description": "Shown when bulk-selection finds no clickable elements"
   },
   "popupAlertFailedToActivateClickClip": {
-    "message": "Failed to activate Click & Clip. Please try again.",
+    "message": "无法激活 Click & Clip，请重试。",
     "description": "Alert message when Click & Clip fails to activate"
   },
   "clickClipTitle": {
@@ -20,15 +20,15 @@
     "description": "Title for the in-page Click & Clip picker panel"
   },
   "clickClipWarning": {
-    "message": "Clicks the buttons you tag. Avoid pages where clicking submits forms or makes purchases.",
+    "message": "将点击您标记的按钮。请避免在提交表单或进行购买的页面上使用。",
     "description": "Safety warning shown in the Click & Clip panel"
   },
   "clickClipPickInfo": {
-    "message": "Click buttons/tabs on the page to tag them.",
+    "message": "点击页面上的按钮/标签以标记它们。",
     "description": "Instruction shown before any triggers are tagged"
   },
   "clickClipTaggedCount": {
-    "message": "$COUNT$ button(s) tagged",
+    "message": "已标记 $COUNT$ 个按钮",
     "description": "Count of tagged trigger buttons",
     "placeholders": {
       "count": {
@@ -37,75 +37,75 @@
     }
   },
   "clickClipPatternLabel": {
-    "message": "Pattern",
+    "message": "模式",
     "description": "Label for the interaction-pattern selector"
   },
   "clickClipPatternAuto": {
-    "message": "Auto-detect",
+    "message": "自动检测",
     "description": "Pattern option: automatically detect the interaction pattern"
   },
   "clickClipPatternTabs": {
-    "message": "Tabs / panels",
+    "message": "标签页 / 面板",
     "description": "Pattern option: tabbed content"
   },
   "clickClipPatternAccordion": {
-    "message": "Accordion",
+    "message": "手风琴",
     "description": "Pattern option: accordion / expandable sections"
   },
   "clickClipPatternLoadMore": {
-    "message": "Load more",
+    "message": "加载更多",
     "description": "Pattern option: a load-more button clicked repeatedly"
   },
   "clickClipPatternPagination": {
-    "message": "Pagination",
+    "message": "分页",
     "description": "Pattern option: next-page pagination"
   },
   "clickClipOutputLabel": {
-    "message": "Output",
+    "message": "输出",
     "description": "Label for the output-mode selector"
   },
   "clickClipOutputFiles": {
-    "message": "File per button",
+    "message": "每个按钮一个文件",
     "description": "Output option: one markdown file per button"
   },
   "clickClipOutputCombined": {
-    "message": "Combined doc",
+    "message": "合并文档",
     "description": "Output option: a single combined markdown document"
   },
   "clickClipCancelBtn": {
-    "message": "Cancel",
+    "message": "取消",
     "description": "Click & Clip cancel button"
   },
   "clickClipTestBtn": {
-    "message": "Test first",
+    "message": "先测试",
     "description": "Click & Clip button that dry-runs the first trigger"
   },
   "clickClipStartBtn": {
-    "message": "Start",
+    "message": "开始",
     "description": "Click & Clip button that starts the run"
   },
   "clickClipMoveUp": {
-    "message": "Move up",
+    "message": "上移",
     "description": "Tooltip for moving a trigger up in the list"
   },
   "clickClipMoveDown": {
-    "message": "Move down",
+    "message": "下移",
     "description": "Tooltip for moving a trigger down in the list"
   },
   "clickClipRemove": {
-    "message": "Remove",
+    "message": "移除",
     "description": "Tooltip for removing a trigger from the list"
   },
   "clickClipRejectLink": {
-    "message": "That link navigates away — use Batch Link for links.",
+    "message": "该链接将跳转到其他页面——请对链接使用批量处理功能。",
     "description": "Shown when the user tries to tag a real navigational link"
   },
   "clickClipRunning": {
-    "message": "Running…",
+    "message": "运行中…",
     "description": "Status while the Click & Clip run is in progress"
   },
   "clickClipRunningItem": {
-    "message": "Processing $CURRENT$ of $TOTAL$…",
+    "message": "正在处理第 $CURRENT$ 个，共 $TOTAL$ 个…",
     "description": "Per-item progress during a Click & Clip run",
     "placeholders": {
       "current": {
@@ -117,7 +117,7 @@
     }
   },
   "clickClipRunningLoadMore": {
-    "message": "Loaded $COUNT$ time(s)…",
+    "message": "已加载 $COUNT$ 次…",
     "description": "Progress for the load-more pattern",
     "placeholders": {
       "count": {
@@ -126,7 +126,7 @@
     }
   },
   "clickClipRunningPage": {
-    "message": "Captured page $PAGE$…",
+    "message": "已捕获第 $PAGE$ 页…",
     "description": "Progress for the pagination pattern",
     "placeholders": {
       "page": {
@@ -135,15 +135,15 @@
     }
   },
   "clickClipNavAborted": {
-    "message": "A click navigated away — stopping.",
+    "message": "点击导致页面跳转——正在停止。",
     "description": "Shown when a click caused navigation and the run was aborted"
   },
   "clickClipFinalizing": {
-    "message": "Saving…",
+    "message": "保存中…",
     "description": "Status while the captured items are being saved"
   },
   "clickClipSuccess": {
-    "message": "Done — $COUNT$ item(s) clipped.",
+    "message": "完成——已剪辑 $COUNT$ 个项目。",
     "description": "Success message after a Click & Clip run",
     "placeholders": {
       "count": {
@@ -152,19 +152,19 @@
     }
   },
   "clickClipNothingCaptured": {
-    "message": "Nothing was captured.",
+    "message": "未捕获任何内容。",
     "description": "Shown when a Click & Clip run produced no content"
   },
   "clickClipRunFailed": {
-    "message": "Click & Clip failed. See console.",
+    "message": "Click & Clip 失败，请查看控制台。",
     "description": "Shown when a Click & Clip run fails"
   },
   "clickClipTesting": {
-    "message": "Testing first button…",
+    "message": "正在测试第一个按钮…",
     "description": "Status during the Test-first dry run"
   },
   "clickClipTestResult": {
-    "message": "Ready to clip this page state ($COUNT$ characters).",
+    "message": "已准备好剪辑此页面状态（$COUNT$ 个字符）。",
     "description": "Result of the Test-first page-state dry run",
     "placeholders": {
       "count": {
@@ -173,7 +173,7 @@
     }
   },
   "clickClipTestNoRegion": {
-    "message": "Unable to capture the page state for the first button.",
+    "message": "无法捕获第一个按钮的页面状态。",
     "description": "Shown when the Test-first dry run cannot capture the page state"
   },
   "extensionName": {
@@ -493,147 +493,147 @@
     "description": "Button label"
   },
   "popupBatchSubtitle": {
-    "message": "Extract content from multiple sources at once.",
+    "message": "一次从多个来源提取内容。",
     "description": "Subtitle for the batch processing view"
   },
   "popupBatchCloseAria": {
-    "message": "Close Batch Processing",
+    "message": "关闭批量处理",
     "description": "ARIA label for closing the batch processing view"
   },
   "popupBatchCaptureMethodTitle": {
-    "message": "Capture Method",
+    "message": "捕获方式",
     "description": "Title for the batch capture method step"
   },
   "popupBatchCaptureMethodDesc": {
-    "message": "Choose how you want to provide the sources.",
+    "message": "选择您希望提供来源的方式。",
     "description": "Description for the batch capture method step"
   },
   "popupBatchCaptureMethodAria": {
-    "message": "Capture method",
+    "message": "捕获方式",
     "description": "ARIA label for the batch capture method selector"
   },
   "popupBatchManualTitle": {
-    "message": "URL Input",
+    "message": "URL 输入",
     "description": "Batch capture method option title for manual URL entry"
   },
   "popupBatchManualDesc": {
-    "message": "Type or paste URLs manually",
+    "message": "手动输入或粘贴 URL",
     "description": "Batch capture method option description for manual URL entry"
   },
   "popupBatchPickTitle": {
-    "message": "Pick Links",
+    "message": "选取链接",
     "description": "Batch capture method option title for picking links from the page"
   },
   "popupBatchPickDesc": {
-    "message": "Extract links from this page",
+    "message": "从此页面提取链接",
     "description": "Batch capture method option description for picking links from the page"
   },
   "popupBatchClickDesc": {
-    "message": "Click elements to extract",
+    "message": "点击元素以提取",
     "description": "Batch capture method option description for Click & Clip"
   },
   "popupBatchStepUrlsTitle": {
-    "message": "URLs",
+    "message": "URL",
     "description": "Title for the manual URL input step"
   },
   "popupBatchStepUrlsHint": {
-    "message": "One per line",
+    "message": "每行一个",
     "description": "Hint for the manual URL input step"
   },
   "popupBatchUrlsAria": {
-    "message": "URLs to convert, one per line",
+    "message": "待转换的 URL，每行一个",
     "description": "ARIA label for the batch URLs textarea"
   },
   "popupBatchPickCurrentPageBtn": {
-    "message": "Pick Links from Current Page",
+    "message": "从当前页面选取链接",
     "description": "Button label for activating the link picker from batch mode"
   },
   "popupBatchPickNote": {
-    "message": "Links will be gathered from the active tab.",
+    "message": "链接将从活动标签页中收集。",
     "description": "Note explaining where picked batch links come from"
   },
   "popupBatchNoLinksTitle": {
-    "message": "No links selected yet",
+    "message": "尚未选择链接",
     "description": "Empty state title for picked batch links"
   },
   "popupBatchNoLinksText": {
-    "message": "Your selected links will appear here.",
+    "message": "您选取的链接将显示在此处。",
     "description": "Empty state text for picked batch links"
   },
   "popupBatchClickPanelTitle": {
-    "message": "Click & Clip runs on the page",
+    "message": "Click & Clip 正在页面上运行",
     "description": "Title for the batch Click & Clip explanation panel"
   },
   "popupBatchClickPanelDesc": {
-    "message": "When you start, the element picker opens on the active tab. Click elements to queue them, then finish from the in-page panel.",
+    "message": "启动后，元素选取器将在活动标签页中打开。点击元素将其加入队列，然后从页面内面板完成操作。",
     "description": "Description for the batch Click & Clip explanation panel"
   },
   "popupBatchOutputFormatTitle": {
-    "message": "Output Format",
+    "message": "输出格式",
     "description": "Title for the batch output format step"
   },
   "popupBatchOutputFormatDesc": {
-    "message": "Choose how the results should be saved.",
+    "message": "选择结果的保存方式。",
     "description": "Description for the batch output format step"
   },
   "popupBatchOutputFormatAria": {
-    "message": "Output format",
+    "message": "输出格式",
     "description": "ARIA label for the batch output format selector"
   },
   "popupBatchOutputZipTitle": {
-    "message": "ZIP Archive",
+    "message": "ZIP 压缩包",
     "description": "Batch output option title for ZIP archive"
   },
   "popupBatchOutputZipDesc": {
-    "message": "All results in a single .zip file",
+    "message": "将所有结果保存到单个 .zip 文件",
     "description": "Batch output option description for ZIP archive"
   },
   "popupBatchOutputIndividualTitle": {
-    "message": "Individual .md Files",
+    "message": "单独的 .md 文件",
     "description": "Batch output option title for individual Markdown files"
   },
   "popupBatchOutputIndividualDesc": {
-    "message": "One Markdown file per source",
+    "message": "每个来源对应一个 Markdown 文件",
     "description": "Batch output option description for individual Markdown files"
   },
   "popupBatchOutputCombinedTitle": {
-    "message": "Combined .md File",
+    "message": "合并 .md 文件",
     "description": "Batch output option title for a combined Markdown file"
   },
   "popupBatchOutputCombinedDesc": {
-    "message": "All results in one Markdown file",
+    "message": "将所有结果保存到一个 Markdown 文件",
     "description": "Batch output option description for a combined Markdown file"
   },
   "popupBatchStartProcessingBtn": {
-    "message": "Start Batch Processing",
+    "message": "开始批量处理",
     "description": "Button label for starting a batch URL or picked-links run"
   },
   "popupBatchStepLinksTitle": {
-    "message": "Links to Capture",
+    "message": "待捕获链接",
     "description": "Title for the picked links step"
   },
   "popupBatchStepLinksDesc": {
-    "message": "Collect links from the current page and add them to the batch list.",
+    "message": "从当前页面收集链接并将其添加到批量列表。",
     "description": "Description for the picked links step"
   },
   "popupBatchStepElementsTitle": {
-    "message": "Elements to Capture",
+    "message": "待捕获元素",
     "description": "Title for the Click & Clip step"
   },
   "popupBatchStepElementsDesc": {
-    "message": "Click & Clip runs directly on the active tab.",
+    "message": "Click & Clip 直接在活动标签页上运行。",
     "description": "Description for the Click & Clip step"
   },
   "popupBatchStartClickClipBtn": {
-    "message": "Start Click & Clip",
+    "message": "启动 Click & Clip",
     "description": "Button label for starting Click & Clip from batch mode"
   },
   "popupBatchLinksSelectedOne": {
-    "message": "1 link selected",
+    "message": "已选择 1 个链接",
     "description": "Picked links count when exactly one link is selected"
   },
   "popupBatchLinksSelectedMany": {
-    "message": "$COUNT$ links selected",
+    "message": "已选择 $COUNT$ 个链接",
     "description": "Picked links count when zero or many links are selected",
     "placeholders": {
       "count": {
@@ -642,43 +642,43 @@
     }
   },
   "popupBatchClearLinksBtn": {
-    "message": "Clear all",
+    "message": "全部清除",
     "description": "Button label for clearing picked links"
   },
   "popupBatchRemoveLinkAria": {
-    "message": "Remove link",
+    "message": "移除链接",
     "description": "ARIA label for removing a picked batch link"
   },
   "popupBatchLoadingPage": {
-    "message": "Loading page...",
+    "message": "正在加载页面...",
     "description": "Batch progress status while loading a page"
   },
   "popupBatchConvertingPage": {
-    "message": "Converting page...",
+    "message": "正在转换页面...",
     "description": "Batch progress status while converting a page"
   },
   "popupBatchRetryingPage": {
-    "message": "Retrying page capture...",
+    "message": "正在重试页面捕获...",
     "description": "Batch progress status while retrying a page capture"
   },
   "popupBatchCreatingZip": {
-    "message": "Creating ZIP archive...",
+    "message": "正在创建 ZIP 压缩包...",
     "description": "Batch progress status while creating the ZIP archive"
   },
   "popupBatchCombining": {
-    "message": "Building combined document...",
+    "message": "正在创建合并文档...",
     "description": "Batch progress status while building a combined Markdown document"
   },
   "popupBatchWarning": {
-    "message": "Warning during conversion",
+    "message": "转换过程中出现警告",
     "description": "Fallback batch warning status"
   },
   "popupBatchFailedUrl": {
-    "message": "Failed URL",
+    "message": "失败的 URL",
     "description": "Fallback label for a failed batch URL"
   },
   "popupBatchItemError": {
-    "message": "Error: $ERROR$",
+    "message": "错误：$ERROR$",
     "description": "Batch progress status for an item error",
     "placeholders": {
       "error": {
@@ -687,15 +687,15 @@
     }
   },
   "popupBatchCancelled": {
-    "message": "Batch cancelled",
+    "message": "批量处理已取消",
     "description": "Batch progress status after cancellation"
   },
   "popupBatchUnknownError": {
-    "message": "Unknown error",
+    "message": "未知错误",
     "description": "Fallback batch error text"
   },
   "popupBatchFailed": {
-    "message": "Batch failed: $ERROR$",
+    "message": "批量处理失败：$ERROR$",
     "description": "Batch progress status after failure",
     "placeholders": {
       "error": {
@@ -704,7 +704,7 @@
     }
   },
   "popupBatchFinishedWithErrors": {
-    "message": "Finished with $COUNT$ error(s)",
+    "message": "已完成，共 $COUNT$ 个错误",
     "description": "Batch progress status when some URLs failed",
     "placeholders": {
       "count": {
@@ -713,15 +713,15 @@
     }
   },
   "popupBatchZipDownloaded": {
-    "message": "ZIP downloaded",
+    "message": "ZIP 已下载",
     "description": "Batch completion status for ZIP output"
   },
   "popupBatchCombinedDownloaded": {
-    "message": "Combined file downloaded",
+    "message": "合并文件已下载",
     "description": "Batch completion status for combined Markdown output"
   },
   "popupBatchComplete": {
-    "message": "Batch complete",
+    "message": "批量处理完成",
     "description": "Batch completion status for individual file output"
   },
   "popupLibraryTitle": {
