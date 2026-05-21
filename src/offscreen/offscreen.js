@@ -156,9 +156,11 @@ function handleMessages(message, sender) {
 
 	  return (async () => {
 	    switch (message.type) {
-	    case 'process-content':
-	      await processContent(message);
-	      break;
+		    case 'process-content':
+		      await processContent(message);
+		      break;
+    case 'process-content-return':
+      return await processContentForReturn(message);
     case 'process-element-content':
       return await processElementContent(message);
     case 'download-markdown':
@@ -204,6 +206,8 @@ function handleMessages(message, sender) {
 	    case 'download-batch-zip':
 	      await downloadBatchZip(message);
 	      break;
+	    case 'render-template':
+	      return renderClickClipTemplate(message);
 	    }
 
 	    return null;
@@ -213,35 +217,43 @@ function handleMessages(message, sender) {
 /**
  * Process HTML content to markdown
  */
+async function buildMarkdownResultFromPageContent(data, options = defaultOptions, suppressTemplate = false) {
+  const domForArticle = buildDomWithSelection(data.dom, data.selection, !!data.clipSelection);
+  const article = await getArticleFromDom(domForArticle, options, data.pageUrl);
+  const resolved = resolveOptionsForArticle(article, options);
+  const templateOptions = { ...resolved.options };
+  const effectiveOptions = suppressTemplate
+    ? { ...resolved.options, includeTemplate: false }
+    : resolved.options;
+
+  const { markdown, imageList, sourceImageMap } = await convertArticleToMarkdown(article, null, effectiveOptions);
+
+  article.title = await formatTitle(article, effectiveOptions);
+  const mdClipsFolder = await formatMdClipsFolder(article, effectiveOptions);
+
+  return {
+    markdown,
+    article,
+    imageList,
+    sourceImageMap,
+    mdClipsFolder,
+    effectiveOptions,
+    templateOptions,
+    matchedSiteRule: resolved.matchedRule,
+    overriddenKeys: resolved.overriddenKeys
+  };
+}
+
 async function processContent(message) {
   try {
-    const { data, requestId, tabId, options } = message;
-    
-    const domForArticle = buildDomWithSelection(data.dom, data.selection, !!data.clipSelection);
-    const article = await getArticleFromDom(domForArticle, options, data.pageUrl);
-    const resolved = resolveOptionsForArticle(article, options);
-    
-    // Convert to markdown using passed options
-    const { markdown, imageList, sourceImageMap } = await convertArticleToMarkdown(article, null, resolved.options);
-    
-    // Format title and folder using passed options
-    article.title = await formatTitle(article, resolved.options);
-    const mdClipsFolder = await formatMdClipsFolder(article, resolved.options);
-    
+    const { data, requestId, options } = message;
+    const result = await buildMarkdownResultFromPageContent(data, options || defaultOptions);
+
     // Send results back to service worker
     await browser.runtime.sendMessage({
       type: 'markdown-result',
       requestId: requestId,
-      result: {
-        markdown,
-        article,
-        imageList,
-        sourceImageMap,
-        mdClipsFolder,
-        effectiveOptions: resolved.options,
-        matchedSiteRule: resolved.matchedRule,
-        overriddenKeys: resolved.overriddenKeys
-      }
+      result
     });
   } catch (error) {
     console.error('Error processing content:', error);
@@ -250,6 +262,24 @@ async function processContent(message) {
       type: 'process-error',
       error: error.message
     });
+  }
+}
+
+async function processContentForReturn(message) {
+  try {
+    const { data, options } = message;
+    const result = await buildMarkdownResultFromPageContent(
+      data,
+      options || defaultOptions,
+      !!message.suppressTemplate
+    );
+    return { ok: true, result };
+  } catch (error) {
+    console.error('Error processing content:', error);
+    return {
+      ok: false,
+      error: error.message
+    };
   }
 }
 
@@ -313,6 +343,15 @@ async function processElementContent(message) {
     const article = buildArticleFromSelectedElement(data, options || defaultOptions);
     const resolved = resolveOptionsForArticle(article, options || defaultOptions);
 
+    // Preserve the resolved options BEFORE any template suppression. resolveOptionsForArticle
+    // re-applies site rules, so a rule can re-enable templates; callers that need to know the
+    // true effective template intent (e.g. Click & Clip combined output, which renders one
+    // document-level frontmatter) read templateOptions rather than effectiveOptions.
+    const templateOptions = { ...resolved.options };
+    if (message.suppressTemplate) {
+      resolved.options = { ...resolved.options, includeTemplate: false };
+    }
+
     const { markdown, imageList, sourceImageMap } = await convertArticleToMarkdown(article, null, resolved.options);
     article.title = await formatTitle(article, resolved.options);
     const mdClipsFolder = await formatMdClipsFolder(article, resolved.options);
@@ -326,6 +365,7 @@ async function processElementContent(message) {
         sourceImageMap,
         mdClipsFolder,
         effectiveOptions: resolved.options,
+        templateOptions,
         matchedSiteRule: resolved.matchedRule,
         overriddenKeys: resolved.overriddenKeys
       }
@@ -340,14 +380,35 @@ async function processElementContent(message) {
 }
 
 /**
+ * Render a single document-level frontmatter/backmatter pair for Click & Clip's
+ * combined output. createEffectiveMarkdownOptions already runs textReplace over
+ * the templates, so this just surfaces the rendered strings.
+ */
+function renderClickClipTemplate(message) {
+  try {
+    const article = message.article || {};
+    const options = message.options || defaultOptions;
+    const eff = createEffectiveMarkdownOptions(article, options);
+    return {
+      ok: true,
+      frontmatter: eff.frontmatter || '',
+      backmatter: eff.backmatter || ''
+    };
+  } catch (error) {
+    console.error('Error rendering Click & Clip template:', error);
+    return { ok: false, error: error.message };
+  }
+}
+
+/**
  * Process context menu actions
  */
 async function processContextMenu(message) {
   const { action, info, tabId, options, customTitle, collectOnly, notificationDelta } = message;
-  
+
   try {
     if (action === 'download') {
-      await handleContextMenuDownload(info, tabId, options, customTitle, collectOnly, notificationDelta);
+      await handleContextMenuDownload(info, tabId, options, customTitle, collectOnly, notificationDelta, message.suppressTemplate, message.captureTemplate);
     } else if (action === 'copy') {
       const copied = await handleContextMenuCopy(info, tabId, options);
       return { ok: copied === true, action };
@@ -432,12 +493,12 @@ function isLikelyIncompleteMarkdown(markdown) {
   );
 }
 
-async function handleContextMenuDownload(info, tabId, providedOptions = null, customTitle = null, collectOnly = false, notificationDelta = null) {
+async function handleContextMenuDownload(info, tabId, providedOptions = null, customTitle = null, collectOnly = false, notificationDelta = null, suppressTemplate = false, captureTemplate = false) {
   console.log(`Starting download for tab ${tabId}`);
   try {
     const options = providedOptions || defaultOptions;
-    
-    const article = await getArticleFromContent(tabId, 
+
+    const article = await getArticleFromContent(tabId,
       info.menuItemId === "download-markdown-selection",
       options
     );
@@ -451,6 +512,15 @@ async function handleContextMenuDownload(info, tabId, providedOptions = null, cu
     }
 
     const resolved = resolveOptionsForArticle(article, options);
+    // Capture the resolved (post-site-rule) template intent before suppression
+    // so combined batch output can render one document-level template.
+    const templateOptions = captureTemplate ? { ...resolved.options } : null;
+    if (suppressTemplate) {
+      // Combined batch output joins every page into one file, so per-page
+      // frontmatter/backmatter would repeat. resolveOptionsForArticle can
+      // re-enable templates via site rules, so suppress after it runs.
+      resolved.options = { ...resolved.options, includeTemplate: false };
+    }
     const effectiveOptions = collectOnly
       ? {
         ...resolved.options,
@@ -480,7 +550,9 @@ async function handleContextMenuDownload(info, tabId, providedOptions = null, cu
       likelyIncomplete: likelyIncomplete,
       markdownLength: markdown.length,
       markdown: collectOnly ? markdown : undefined,
-      fullFilename: collectOnly ? fullFilename : undefined
+      fullFilename: collectOnly ? fullFilename : undefined,
+      templateArticle: captureTemplate ? article : undefined,
+      templateOptions: captureTemplate ? templateOptions : undefined
     });
   } catch (error) {
     console.error(`Error processing tab ${tabId}:`, error);

@@ -2275,8 +2275,6 @@ a:hover {
 
 .special-theme-disclaimer {
     margin-top: var(--space-4);
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--border-light);
     font-size: var(--text-xs);
     color: var(--text-tertiary);
     line-height: 1.5;
@@ -2419,8 +2417,6 @@ a:hover {
 /* Context Menu Items */
 .context-menu-items-panel {
     margin-top: var(--space-4);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--border-light);
 }
 
 .context-menu-items-header {
@@ -3378,8 +3374,6 @@ code {
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-4);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--border-light);
     margin-top: var(--space-4);
 }
 

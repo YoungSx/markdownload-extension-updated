@@ -27,6 +27,11 @@ let libraryStateLoadPromise = null;
 let libraryStateLoaded = false;
 let batchSettingsLoadPromise = null;
 let batchSettingsLoaded = false;
+// Batch Processing redesign state
+let batchCaptureMethod = 'manual';   // manual | pick | click
+let batchOutputFormat = 'zip';       // zip | individual | combined
+let batchPickedLinks = [];           // array of URL strings collected via the link picker
+let batchManualValidCount = 0;       // valid URLs in the manual textarea (drives Start button)
 let activeTabPromise = null;
 let activeTabCache = null;
 let currentOptions = null;
@@ -412,9 +417,14 @@ const dom = {
     pickElementButton: document.getElementById('pickElement'),
     clipOption: document.getElementById('clipOption'),
     urlList: document.getElementById('urlList'),
-    convertUrlsButton: document.getElementById('convertUrls'),
+    startBatchButton: document.getElementById('startBatch'),
+    startBatchLabel: document.getElementById('startBatchLabel'),
+    batchFooter: document.getElementById('batchFooter'),
     pickLinksButton: document.getElementById('pickLinks'),
-    batchSaveModeToggle: document.getElementById('batchSaveModeToggle'),
+    batchStep2Title: document.getElementById('batchStep2Title'),
+    batchStep2Desc: document.getElementById('batchStep2Desc'),
+    batchStep2Hint: document.getElementById('batchStep2Hint'),
+    batchLinkList: document.getElementById('batchLinkList'),
     batchProcessButton: document.getElementById('batchProcess'),
     themeToggleButton: document.getElementById('themeToggle'),
     openGuideButton: document.getElementById('openGuide'),
@@ -762,7 +772,9 @@ function getPopupViewFocusTarget(viewName) {
         case 'main':
             return dom.downloadButton;
         case 'batch':
-            return dom.urlList || dom.convertUrlsButton;
+            return batchCaptureMethod === 'manual'
+                ? (dom.urlList || dom.startBatchButton)
+                : dom.startBatchButton;
         case 'library':
             return libraryUI.close;
         default:
@@ -1946,7 +1958,7 @@ dom.pdfButton?.addEventListener("click", async (event) => {
 });
 
 document.getElementById("batchProcess").addEventListener("click", showBatchProcess);
-dom.convertUrlsButton?.addEventListener("click", handleBatchConversion);
+dom.startBatchButton?.addEventListener("click", handleStartBatch);
 document.getElementById("cancelBatch").addEventListener("click", hideBatchProcess);
 libraryUI.toggle?.addEventListener("click", showLibraryView);
 libraryUI.close?.addEventListener("click", hideLibraryView);
@@ -1968,28 +1980,209 @@ dom.shortcutsModalBody?.addEventListener('click', (e) => {
 });
 dom.pickLinksButton?.addEventListener("click", activateLinkPicker);
 dom.pickElementButton?.addEventListener("click", activateElementPicker);
-dom.batchSaveModeToggle?.addEventListener("change", saveBatchSettings);
+document.querySelectorAll('[data-capture-method]').forEach((card) => {
+    card.addEventListener('click', () => setCaptureMethod(card.dataset.captureMethod));
+});
+document.querySelectorAll('[data-output-format]').forEach((card) => {
+    card.addEventListener('click', () => setOutputFormat(card.dataset.outputFormat));
+});
+dom.batchLinkList?.addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('[data-remove-link]');
+    if (removeBtn) {
+        const index = Number(removeBtn.dataset.removeLink);
+        if (Number.isInteger(index)) {
+            batchPickedLinks.splice(index, 1);
+            renderBatchPickedLinks();
+            saveBatchSettings();
+            updateStartBatchButton();
+        }
+        return;
+    }
+    if (e.target.closest('[data-clear-links]')) {
+        batchPickedLinks = [];
+        renderBatchPickedLinks();
+        saveBatchSettings();
+        updateStartBatchButton();
+    }
+});
 progressUI.cancelBtn?.addEventListener("click", () => {
     browser.runtime.sendMessage({ type: 'cancel-batch' }).catch(() => {});
     progressUI.cancelBtn.disabled = true;
     progressUI.cancelBtn.textContent = popupMessage('popupCancelling', null, 'Cancelling...');
 });
 
-function getSelectedBatchSaveMode() {
-    return dom.batchSaveModeToggle?.checked ? 'individual' : 'zip';
+const CAPTURE_METHODS = ['manual', 'pick', 'click'];
+const OUTPUT_FORMATS = ['zip', 'individual', 'combined'];
+
+const BATCH_STEP2_META = {
+    manual: {
+        titleKey: 'popupBatchStepUrlsTitle',
+        titleFallback: 'URLs',
+        descKey: null,
+        descFallback: '',
+        hintKey: 'popupBatchStepUrlsHint',
+        hintFallback: 'One per line'
+    },
+    pick: {
+        titleKey: 'popupBatchStepLinksTitle',
+        titleFallback: 'Links to Capture',
+        descKey: 'popupBatchStepLinksDesc',
+        descFallback: 'Collect links from the current page and add them to the batch list.',
+        hintKey: null,
+        hintFallback: ''
+    },
+    click: {
+        titleKey: 'popupBatchStepElementsTitle',
+        titleFallback: 'Elements to Capture',
+        descKey: 'popupBatchStepElementsDesc',
+        descFallback: 'Click & Clip runs directly on the active tab.',
+        hintKey: null,
+        hintFallback: ''
+    }
+};
+
+function getSelectedOutputFormat() {
+    return OUTPUT_FORMATS.includes(batchOutputFormat) ? batchOutputFormat : 'zip';
 }
 
-function setSelectedBatchSaveMode(mode) {
-    if (dom.batchSaveModeToggle) dom.batchSaveModeToggle.checked = mode === 'individual';
+// Translate the unified output format into Click & Clip's two-axis model.
+function clickClipModesFromOutputFormat(format) {
+    if (format === 'combined') {
+        return { clickClipOutputMode: 'combined', batchSaveMode: 'zip' };
+    }
+    if (format === 'individual') {
+        return { clickClipOutputMode: 'files', batchSaveMode: 'individual' };
+    }
+    return { clickClipOutputMode: 'files', batchSaveMode: 'zip' };
+}
+
+function syncCaptureMethodUi() {
+    document.querySelectorAll('[data-capture-method]').forEach((card) => {
+        const selected = card.dataset.captureMethod === batchCaptureMethod;
+        card.classList.toggle('is-selected', selected);
+        card.setAttribute('aria-checked', String(selected));
+    });
+    document.querySelectorAll('[data-capture-panel]').forEach((panel) => {
+        panel.hidden = panel.dataset.capturePanel !== batchCaptureMethod;
+    });
+
+    const meta = BATCH_STEP2_META[batchCaptureMethod] || BATCH_STEP2_META.manual;
+    const title = meta.titleKey ? popupMessage(meta.titleKey, null, meta.titleFallback) : meta.titleFallback;
+    const desc = meta.descKey ? popupMessage(meta.descKey, null, meta.descFallback) : meta.descFallback;
+    const hint = meta.hintKey ? popupMessage(meta.hintKey, null, meta.hintFallback) : meta.hintFallback;
+
+    if (dom.batchStep2Title) dom.batchStep2Title.textContent = title;
+    if (dom.batchStep2Desc) {
+        dom.batchStep2Desc.textContent = desc;
+        dom.batchStep2Desc.hidden = !desc;
+    }
+    if (dom.batchStep2Hint) {
+        dom.batchStep2Hint.textContent = hint;
+        dom.batchStep2Hint.hidden = !hint;
+    }
+}
+
+function syncOutputFormatUi() {
+    document.querySelectorAll('[data-output-format]').forEach((card) => {
+        const selected = card.dataset.outputFormat === batchOutputFormat;
+        card.classList.toggle('is-selected', selected);
+        card.setAttribute('aria-checked', String(selected));
+    });
+}
+
+function setCaptureMethod(method, { persist = true } = {}) {
+    if (!CAPTURE_METHODS.includes(method)) return;
+    batchCaptureMethod = method;
+    syncCaptureMethodUi();
+    if (method === 'manual') {
+        validateAndPreviewUrls();
+    } else {
+        updateStartBatchButton();
+    }
+    if (persist) saveBatchSettings();
+}
+
+function setOutputFormat(format, { persist = true } = {}) {
+    if (!OUTPUT_FORMATS.includes(format)) return;
+    batchOutputFormat = format;
+    syncOutputFormatUi();
+    if (persist) saveBatchSettings();
+}
+
+// Reflect the Start button label/disabled state for the active capture method.
+function updateStartBatchButton() {
+    const button = dom.startBatchButton;
+    if (!button) return;
+
+    if (dom.startBatchLabel) {
+        dom.startBatchLabel.textContent = batchCaptureMethod === 'click'
+            ? popupMessage('popupBatchStartClickClipBtn', null, 'Start Click & Clip')
+            : popupMessage('popupBatchStartProcessingBtn', null, 'Start Batch Processing');
+    }
+
+    let disabled = false;
+    if (batchCaptureMethod === 'manual') {
+        const trimmed = (dom.urlList?.value || '').trim();
+        disabled = trimmed.length > 0 && batchManualValidCount === 0;
+    } else if (batchCaptureMethod === 'pick') {
+        disabled = batchPickedLinks.length === 0;
+    }
+    button.disabled = disabled;
+}
+
+// Render the picked-links list (or empty state) for the Pick Links method.
+function renderBatchPickedLinks() {
+    const list = dom.batchLinkList;
+    if (!list) return;
+
+    list.querySelectorAll('.batch-link-list-head, .batch-link-row').forEach((node) => node.remove());
+    const emptyState = document.getElementById('batchLinkEmpty');
+
+    if (batchPickedLinks.length === 0) {
+        if (emptyState) emptyState.hidden = false;
+        return;
+    }
+    if (emptyState) emptyState.hidden = true;
+
+    const head = document.createElement('div');
+    head.className = 'batch-link-list-head';
+    const count = document.createElement('span');
+    count.textContent = batchPickedLinks.length === 1
+        ? popupMessage('popupBatchLinksSelectedOne', null, '1 link selected')
+        : popupMessage('popupBatchLinksSelectedMany', [batchPickedLinks.length], `${batchPickedLinks.length} links selected`);
+    const clear = document.createElement('button');
+    clear.type = 'button';
+    clear.className = 'batch-link-clear';
+    clear.dataset.clearLinks = 'true';
+    clear.textContent = popupMessage('popupBatchClearLinksBtn', null, 'Clear all');
+    head.append(count, clear);
+    list.appendChild(head);
+
+    batchPickedLinks.forEach((url, index) => {
+        const row = document.createElement('div');
+        row.className = 'batch-link-row';
+        const urlEl = document.createElement('span');
+        urlEl.className = 'batch-link-row__url';
+        urlEl.textContent = url;
+        urlEl.title = url;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'batch-link-row__remove';
+        remove.dataset.removeLink = String(index);
+        remove.setAttribute('aria-label', popupMessage('popupBatchRemoveLinkAria', null, 'Remove link'));
+        remove.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        row.append(urlEl, remove);
+        list.appendChild(row);
+    });
 }
 
 // Save batch settings to storage
 function saveBatchSettings() {
-    const urlList = dom.urlList?.value || '';
-    const batchSaveMode = getSelectedBatchSaveMode();
     browser.storage.local.set({
-        batchUrlList: urlList,
-        batchSaveMode
+        batchUrlList: dom.urlList?.value || '',
+        batchCaptureMethod,
+        batchOutputFormat,
+        batchPickedLinks
     }).catch(err => {
         console.error("Error saving batch settings:", err);
     });
@@ -1998,11 +2191,40 @@ function saveBatchSettings() {
 // Load batch settings from storage
 async function loadBatchSettings() {
     try {
-        const data = await browser.storage.local.get(['batchUrlList', 'batchSaveMode']);
+        const data = await browser.storage.local.get([
+            'batchUrlList', 'batchCaptureMethod', 'batchOutputFormat', 'batchPickedLinks',
+            'batchSaveMode', 'clickClipOutputMode'
+        ]);
         if (data.batchUrlList && dom.urlList) {
             dom.urlList.value = data.batchUrlList;
         }
-        setSelectedBatchSaveMode(data.batchSaveMode || 'zip');
+
+        batchCaptureMethod = CAPTURE_METHODS.includes(data.batchCaptureMethod)
+            ? data.batchCaptureMethod
+            : 'manual';
+
+        // Prefer the unified key; otherwise migrate from the pre-redesign
+        // settings — a legacy "individual" save mode or a legacy "combined"
+        // Click & Clip output each carry forward to the matching format.
+        let format = data.batchOutputFormat;
+        if (!OUTPUT_FORMATS.includes(format)) {
+            if (data.batchSaveMode === 'individual') {
+                format = 'individual';
+            } else if (data.clickClipOutputMode === 'combined') {
+                format = 'combined';
+            } else {
+                format = 'zip';
+            }
+        }
+        batchOutputFormat = format;
+
+        batchPickedLinks = Array.isArray(data.batchPickedLinks)
+            ? data.batchPickedLinks.filter((url) => typeof url === 'string' && url)
+            : [];
+
+        syncCaptureMethodUi();
+        syncOutputFormatUi();
+        renderBatchPickedLinks();
         validateAndPreviewUrls();
         batchSettingsLoaded = true;
         return data;
@@ -2096,6 +2318,52 @@ async function activateLinkPicker(e) {
     } catch (error) {
         console.error("Error activating link picker:", error);
         alert(popupMessage('popupAlertFailedToActivateLinkPicker', null, 'Failed to activate link picker. Please try again.'));
+    }
+}
+
+async function activateClickClip(e) {
+    e.preventDefault();
+
+    try {
+        const activeTab = await getActiveTab();
+        if (!activeTab?.id) {
+            throw new Error(popupMessage('popupNoActiveTabError', null, 'No active tab found'));
+        }
+
+        if (isRestrictedTabUrl(activeTab.url || '')) {
+            showError(getRestrictedPageMessage(activeTab.url || ''));
+            return;
+        }
+
+        // Ensure content script is injected
+        await browser.scripting.executeScript({
+            target: { tabId: activeTab.id },
+            files: ["/browser-polyfill.min.js", "/shared/i18n.js", "/contentScript/contentScript.js"]
+        }).catch(err => {
+            console.log("Content script may already be injected:", err);
+        });
+
+        // Persist current settings, then seed the in-page picker with them.
+        await ensureBatchSettingsLoaded();
+        const clickClipModes = clickClipModesFromOutputFormat(getSelectedOutputFormat());
+        const response = await browser.tabs.sendMessage(activeTab.id, {
+            type: "ACTIVATE_CLICK_CLIP",
+            captureOptions: {
+                skipHiddenContent: currentOptions?.skipHiddenContent === true
+            },
+            clickClipOutputMode: clickClipModes.clickClipOutputMode,
+            batchSaveMode: clickClipModes.batchSaveMode
+        });
+        if (response?.success === false) {
+            throw new Error(response.error || popupMessage('popupAlertFailedToActivateClickClip', null, 'Failed to activate Click & Clip. Please try again.'));
+        }
+
+        // Focus the tab — the picker runs in-page and the popup closes.
+        await browser.tabs.update(activeTab.id, { active: true });
+        window.close();
+    } catch (error) {
+        console.error("Error activating Click & Clip:", error);
+        alert(popupMessage('popupAlertFailedToActivateClickClip', null, 'Failed to activate Click & Clip. Please try again.'));
     }
 }
 
@@ -3219,7 +3487,6 @@ let _urlValidationTimer = null;
 
 function validateAndPreviewUrls() {
     const urlValidation = document.getElementById('urlValidation');
-    const convertBtn = dom.convertUrlsButton;
     const text = dom.urlList?.value || '';
     const lines = text.split('\n').map(l => l.trim()).filter(l => l);
     const sharedApi = getPopupBatchUtilsApi();
@@ -3229,7 +3496,8 @@ function validateAndPreviewUrls() {
 
     if ((summary?.totalLines ?? lines.length) === 0) {
         urlValidation.style.display = 'none';
-        convertBtn.disabled = false;
+        batchManualValidCount = 0;
+        updateStartBatchButton();
         return;
     }
 
@@ -3251,6 +3519,8 @@ function validateAndPreviewUrls() {
         }
     }
 
+    batchManualValidCount = validCount;
+
     urlValidation.style.display = 'block';
     urlValidation.classList.remove('has-invalid', 'all-invalid');
 
@@ -3266,7 +3536,6 @@ function validateAndPreviewUrls() {
             ? popupMessage('popupUrlValidationNoValidOne', null, '1 invalid line - no valid URLs')
             : popupMessage('popupUrlValidationNoValidMany', [invalidCount], `${invalidCount} invalid lines - no valid URLs`);
         urlValidation.classList.add('all-invalid');
-        convertBtn.disabled = true;
     } else if (invalidCount > 0) {
         urlValidation.textContent = popupMessage(
             'popupUrlValidationMixedFormat',
@@ -3274,11 +3543,11 @@ function validateAndPreviewUrls() {
             `${validPart}, ${invalidPart}`
         );
         urlValidation.classList.add('has-invalid');
-        convertBtn.disabled = false;
     } else {
         urlValidation.textContent = validPart;
-        convertBtn.disabled = false;
     }
+
+    updateStartBatchButton();
 }
 
 function debouncedValidateUrls() {
@@ -3468,28 +3737,63 @@ async function clipTabWithRetry(tab, maxAttempts = 2) {
     return lastMessage;
 }
 
-async function handleBatchConversion(e) {
-    e.preventDefault();
+function setBatchFooterVisible(visible) {
+    if (dom.batchFooter) {
+        dom.batchFooter.style.display = visible ? '' : 'none';
+    }
+}
+
+// Single entry point for the "Start Batch Processing" button. Routes to the
+// right flow based on the selected capture method.
+async function handleStartBatch(e) {
+    if (e) e.preventDefault();
 
     if (currentOptions?.batchProcessingEnabled === false) {
         showError(popupMessage('popupBatchDisabledError', null, 'Batch Processing is disabled in Options'), false);
         return;
     }
-    
-    const urlText = dom.urlList?.value || '';
-    const urlObjects = processUrlInput(urlText);
-    
+
+    if (batchCaptureMethod === 'click') {
+        await activateClickClip(e);
+        return;
+    }
+
+    const source = batchCaptureMethod === 'pick'
+        ? batchPickedLinks.join('\n')
+        : (dom.urlList?.value || '');
+    const urlObjects = processUrlInput(source);
+
     if (urlObjects.length === 0) {
         showError(popupMessage('popupEnterValidUrlsError', null, 'Please enter valid URLs or markdown links (one per line)'), false);
         return;
     }
-    const batchSaveMode = getSelectedBatchSaveMode();
+
+    await handleBatchConversion(e, urlObjects);
+}
+
+async function handleBatchConversion(e, providedUrlObjects = null) {
+    if (e) e.preventDefault();
+
+    if (currentOptions?.batchProcessingEnabled === false) {
+        showError(popupMessage('popupBatchDisabledError', null, 'Batch Processing is disabled in Options'), false);
+        return;
+    }
+
+    const urlObjects = Array.isArray(providedUrlObjects)
+        ? providedUrlObjects
+        : processUrlInput(dom.urlList?.value || '');
+
+    if (urlObjects.length === 0) {
+        showError(popupMessage('popupEnterValidUrlsError', null, 'Please enter valid URLs or markdown links (one per line)'), false);
+        return;
+    }
+    const batchSaveMode = getSelectedOutputFormat();
 
     // Default path: run batch in service worker so popup lifecycle doesn't interrupt processing.
     // Keep inline mode for e2e tests by setting window.__MARKSNIP_FORCE_INLINE_BATCH__ = true.
     if (!window.__MARKSNIP_FORCE_INLINE_BATCH__) {
         dom.spinner.style.display = 'flex';
-        dom.convertUrlsButton.style.display = 'none';
+        setBatchFooterVisible(false);
         progressUI.show();
         progressUI.reset();
         progressUI.setStatus(popupMessage('popupStartingBackgroundBatch', null, 'Starting background batch...'));
@@ -3512,13 +3816,13 @@ async function handleBatchConversion(e) {
             console.error('Failed to start background batch:', error);
             progressUI.setStatus(`Error: ${error.message}`);
             dom.spinner.style.display = 'none';
-            dom.convertUrlsButton.style.display = 'block';
+            setBatchFooterVisible(true);
         }
         return;
     }
 
     dom.spinner.style.display = 'flex';
-    dom.convertUrlsButton.style.display = 'none';
+    setBatchFooterVisible(false);
     progressUI.show();
     progressUI.reset();
 
@@ -3585,7 +3889,8 @@ async function handleBatchConversion(e) {
         await new Promise(resolve => setTimeout(resolve, 1000)); // Show completion briefly
 
         // Clear saved batch URLs after successful completion
-        await browser.storage.local.remove('batchUrlList');
+        batchPickedLinks = [];
+        await browser.storage.local.remove(['batchUrlList', 'batchPickedLinks']);
 
         await restoreOriginalTab();
 
@@ -3598,7 +3903,7 @@ async function handleBatchConversion(e) {
         console.error('Batch processing error:', error);
         progressUI.setStatus(`Error: ${error.message}`);
         dom.spinner.style.display = 'none';
-        dom.convertUrlsButton.style.display = 'block';
+        setBatchFooterVisible(true);
     }
 }
 
@@ -3843,6 +4148,7 @@ async function restoreBatchState() {
     await ensureBatchSettingsLoaded();
     await setPopupView('batch', { immediate: true });
     dom.spinner.style.display = 'none';
+    setBatchFooterVisible(false);
     progressUI.show();
     progressUI.showCancelButton();
     const current = state.current || 0;
@@ -4019,32 +4325,32 @@ function handleLinkPickerComplete(links) {
         return;
     }
 
-    // Get current textarea value
-    const urlListTextarea = dom.urlList;
-    const currentUrls = urlListTextarea.value.trim();
+    const cleanLinks = links.filter((url) => typeof url === 'string' && url);
+    if (cleanLinks.length === 0) {
+        return;
+    }
 
-    // Combine existing URLs with new ones (deduplicate)
-    const existingUrls = currentUrls ? currentUrls.split('\n') : [];
-    const allUrls = [...new Set([...existingUrls, ...links])];
-
-    // Update textarea
-    urlListTextarea.value = allUrls.join('\n');
-
-    // Save to storage
+    // Merge into the picked-links list (deduplicated) and switch to the
+    // Pick Links capture method so the results are visible immediately.
+    batchPickedLinks = [...new Set([...batchPickedLinks, ...cleanLinks])];
+    setCaptureMethod('pick');
+    renderBatchPickedLinks();
     saveBatchSettings();
-    validateAndPreviewUrls();
+    updateStartBatchButton();
 
-    // Show success message
-    console.log(`Added ${links.length} links to batch processor`);
+    console.log(`Added ${cleanLinks.length} links to batch processor`);
 
-    // Optional: Show temporary success indicator
+    // Show a temporary success indicator on the pick button.
     const pickLinksBtn = dom.pickLinksButton;
+    if (!pickLinksBtn) {
+        return;
+    }
     const originalText = pickLinksBtn.innerHTML;
     pickLinksBtn.innerHTML = `
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="20 6 9 17 4 12"/>
         </svg>
-        ${popupMessage('popupAddedLinksFeedback', [links.length], `Added ${links.length} links!`)}
+        ${popupMessage('popupAddedLinksFeedback', [cleanLinks.length], `Added ${cleanLinks.length} links!`)}
     `;
     pickLinksBtn.classList.add("success");
 
@@ -4660,6 +4966,7 @@ function notify(message) {
     }
     else if (message.type === "batch-progress") {
         progressUI.show();
+        setBatchFooterVisible(false);
 
         const total = message.total || 0;
         const current = message.current || 0;
@@ -4676,44 +4983,63 @@ function notify(message) {
                 progressUI.showCancelButton();
                 break;
             case 'loading':
-                progressUI.setStatus('Loading page...');
+                progressUI.setStatus(popupMessage('popupBatchLoadingPage', null, 'Loading page...'));
                 break;
             case 'converting':
-                progressUI.setStatus('Converting page...');
+                progressUI.setStatus(popupMessage('popupBatchConvertingPage', null, 'Converting page...'));
                 break;
             case 'retrying':
-                progressUI.setStatus('Retrying page capture...');
+                progressUI.setStatus(popupMessage('popupBatchRetryingPage', null, 'Retrying page capture...'));
                 break;
             case 'zipping':
-                progressUI.setStatus('Creating ZIP archive...');
+                progressUI.setStatus(popupMessage('popupBatchCreatingZip', null, 'Creating ZIP archive...'));
+                break;
+            case 'combining':
+                progressUI.setStatus(popupMessage('popupBatchCombining', null, 'Building combined document...'));
                 break;
             case 'warning':
-                progressUI.setStatus(message.message || 'Warning during conversion');
+                progressUI.setStatus(message.message || popupMessage('popupBatchWarning', null, 'Warning during conversion'));
                 break;
             case 'item-error':
-                progressUI.setStatus(`Error: ${message.error || 'Failed URL'}`);
+                progressUI.setStatus(popupMessage(
+                    'popupBatchItemError',
+                    [message.error || popupMessage('popupBatchFailedUrl', null, 'Failed URL')],
+                    `Error: ${message.error || 'Failed URL'}`
+                ));
                 break;
             case 'cancelled':
-                progressUI.setStatus('Batch cancelled');
+                progressUI.setStatus(popupMessage('popupBatchCancelled', null, 'Batch cancelled'));
                 progressUI.hideCancelButton();
                 dom.spinner.style.display = 'none';
-                dom.convertUrlsButton.style.display = 'block';
+                setBatchFooterVisible(true);
                 break;
             case 'failed':
-                progressUI.setStatus(`Batch failed: ${message.error || 'Unknown error'}`);
+                progressUI.setStatus(popupMessage(
+                    'popupBatchFailed',
+                    [message.error || popupMessage('popupBatchUnknownError', null, 'Unknown error')],
+                    `Batch failed: ${message.error || 'Unknown error'}`
+                ));
                 progressUI.hideCancelButton();
                 dom.spinner.style.display = 'none';
-                dom.convertUrlsButton.style.display = 'block';
+                setBatchFooterVisible(true);
                 break;
             case 'finished':
                 if (message.failed > 0) {
-                    progressUI.setStatus(`Finished with ${message.failed} error(s)`);
+                    progressUI.setStatus(popupMessage(
+                        'popupBatchFinishedWithErrors',
+                        [message.failed],
+                        `Finished with ${message.failed} error(s)`
+                    ));
+                } else if (message.batchSaveMode === 'zip') {
+                    progressUI.setStatus(popupMessage('popupBatchZipDownloaded', null, 'ZIP downloaded'));
+                } else if (message.batchSaveMode === 'combined') {
+                    progressUI.setStatus(popupMessage('popupBatchCombinedDownloaded', null, 'Combined file downloaded'));
                 } else {
-                    progressUI.setStatus(message.batchSaveMode === 'zip' ? 'ZIP downloaded' : 'Batch complete');
+                    progressUI.setStatus(popupMessage('popupBatchComplete', null, 'Batch complete'));
                 }
                 progressUI.hideCancelButton();
                 dom.spinner.style.display = 'none';
-                dom.convertUrlsButton.style.display = 'block';
+                setBatchFooterVisible(true);
                 break;
         }
     }

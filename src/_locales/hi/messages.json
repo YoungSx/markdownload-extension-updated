@@ -1,4 +1,181 @@
 {
+  "clickClipBulkBtn": {
+    "message": "कंटेनर में सब जोड़ें",
+    "description": "Button that starts container bulk-selection of triggers"
+  },
+  "clickClipBulkPrompt": {
+    "message": "कंटेनर के सभी बटन टैग करने के लिए उस पर क्लिक करें।",
+    "description": "Prompt shown while bulk-selection mode is armed"
+  },
+  "clickClipBulkNone": {
+    "message": "उस कंटेनर में कोई बटन नहीं मिला।",
+    "description": "Shown when bulk-selection finds no clickable elements"
+  },
+  "popupAlertFailedToActivateClickClip": {
+    "message": "Click & Clip सक्रिय नहीं हो सका। कृपया पुनः प्रयास करें।",
+    "description": "Alert message when Click & Clip fails to activate"
+  },
+  "clickClipTitle": {
+    "message": "Click & Clip",
+    "description": "Title for the in-page Click & Clip picker panel"
+  },
+  "clickClipWarning": {
+    "message": "आपके द्वारा टैग किए गए बटन पर क्लिक करता है। ऐसे पेज से बचें जहाँ क्लिक करने से फ़ॉर्म सबमिट होते हैं या खरीदारी होती है।",
+    "description": "Safety warning shown in the Click & Clip panel"
+  },
+  "clickClipPickInfo": {
+    "message": "टैग करने के लिए पेज पर बटन/टैब पर क्लिक करें।",
+    "description": "Instruction shown before any triggers are tagged"
+  },
+  "clickClipTaggedCount": {
+    "message": "$COUNT$ बटन टैग किए गए",
+    "description": "Count of tagged trigger buttons",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipPatternLabel": {
+    "message": "पैटर्न",
+    "description": "Label for the interaction-pattern selector"
+  },
+  "clickClipPatternAuto": {
+    "message": "स्वतः पहचान",
+    "description": "Pattern option: automatically detect the interaction pattern"
+  },
+  "clickClipPatternTabs": {
+    "message": "टैब / पैनल",
+    "description": "Pattern option: tabbed content"
+  },
+  "clickClipPatternAccordion": {
+    "message": "अकॉर्डियन",
+    "description": "Pattern option: accordion / expandable sections"
+  },
+  "clickClipPatternLoadMore": {
+    "message": "और लोड करें",
+    "description": "Pattern option: a load-more button clicked repeatedly"
+  },
+  "clickClipPatternPagination": {
+    "message": "पेजिनेशन",
+    "description": "Pattern option: next-page pagination"
+  },
+  "clickClipOutputLabel": {
+    "message": "आउटपुट",
+    "description": "Label for the output-mode selector"
+  },
+  "clickClipOutputFiles": {
+    "message": "प्रति बटन एक फ़ाइल",
+    "description": "Output option: one markdown file per button"
+  },
+  "clickClipOutputCombined": {
+    "message": "संयुक्त दस्तावेज़",
+    "description": "Output option: a single combined markdown document"
+  },
+  "clickClipCancelBtn": {
+    "message": "रद्द करें",
+    "description": "Click & Clip cancel button"
+  },
+  "clickClipTestBtn": {
+    "message": "पहले परीक्षण करें",
+    "description": "Click & Clip button that dry-runs the first trigger"
+  },
+  "clickClipStartBtn": {
+    "message": "शुरू करें",
+    "description": "Click & Clip button that starts the run"
+  },
+  "clickClipMoveUp": {
+    "message": "ऊपर जाएं",
+    "description": "Tooltip for moving a trigger up in the list"
+  },
+  "clickClipMoveDown": {
+    "message": "नीचे जाएं",
+    "description": "Tooltip for moving a trigger down in the list"
+  },
+  "clickClipRemove": {
+    "message": "हटाएँ",
+    "description": "Tooltip for removing a trigger from the list"
+  },
+  "clickClipRejectLink": {
+    "message": "यह लिंक दूसरे पेज पर ले जाता है — लिंक के लिए बैच लिंक उपयोग करें।",
+    "description": "Shown when the user tries to tag a real navigational link"
+  },
+  "clickClipRunning": {
+    "message": "चल रहा है…",
+    "description": "Status while the Click & Clip run is in progress"
+  },
+  "clickClipRunningItem": {
+    "message": "$TOTAL$ में से $CURRENT$ प्रोसेस हो रहा है…",
+    "description": "Per-item progress during a Click & Clip run",
+    "placeholders": {
+      "current": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "clickClipRunningLoadMore": {
+    "message": "$COUNT$ बार लोड किया…",
+    "description": "Progress for the load-more pattern",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipRunningPage": {
+    "message": "पेज $PAGE$ कैप्चर हुआ…",
+    "description": "Progress for the pagination pattern",
+    "placeholders": {
+      "page": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipNavAborted": {
+    "message": "एक क्लिक से नेविगेशन हुआ — रुक रहा है।",
+    "description": "Shown when a click caused navigation and the run was aborted"
+  },
+  "clickClipFinalizing": {
+    "message": "सहेजा जा रहा है…",
+    "description": "Status while the captured items are being saved"
+  },
+  "clickClipSuccess": {
+    "message": "पूर्ण — $COUNT$ आइटम क्लिप किए गए।",
+    "description": "Success message after a Click & Clip run",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipNothingCaptured": {
+    "message": "कुछ भी कैप्चर नहीं हुआ।",
+    "description": "Shown when a Click & Clip run produced no content"
+  },
+  "clickClipRunFailed": {
+    "message": "Click & Clip विफल। कंसोल देखें।",
+    "description": "Shown when a Click & Clip run fails"
+  },
+  "clickClipTesting": {
+    "message": "पहले बटन का परीक्षण हो रहा है…",
+    "description": "Status during the Test-first dry run"
+  },
+  "clickClipTestResult": {
+    "message": "इस पेज स्थिति को क्लिप करने के लिए तैयार ($COUNT$ अक्षर)।",
+    "description": "Result of the Test-first page-state dry run",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipTestNoRegion": {
+    "message": "पहले बटन के लिए पेज स्थिति कैप्चर नहीं हो सकी।",
+    "description": "Shown when the Test-first dry run cannot capture the page state"
+  },
   "extensionName": {
     "message": "MarkSnip - मार्कडाउन वेब क्लिपर",
     "description": "The name of the extension"
@@ -303,25 +480,9 @@
     "message": "बैच प्रोसेसिंग",
     "description": "Title for batch processing section"
   },
-  "popupUrlsLabel": {
-    "message": "URLs (हर लाइन में एक)",
-    "description": "Label for batch URLs textarea"
-  },
   "popupUrlsPlaceholder": {
     "message": "https://example.com/page1\nhttps://example.com/page2\n\nया मार्कडाउन लिंक्स का इस्तेमाल करें:\n[Page Title](https://example.com)",
     "description": "Placeholder for batch URLs textarea"
-  },
-  "popupPickLinksBtn": {
-    "message": "पेज से लिंक्स चुनें",
-    "description": "Button label"
-  },
-  "popupBatchSaveZip": {
-    "message": "ZIP फ़ाइल",
-    "description": "Toggle option for batch save mode"
-  },
-  "popupBatchSaveIndividual": {
-    "message": "अलग-अलग",
-    "description": "Toggle option for batch save mode"
   },
   "popupProgressProcessing": {
     "message": "प्रोसेस हो रहा है...",
@@ -331,9 +492,237 @@
     "message": "कैंसल करें",
     "description": "Button label"
   },
-  "popupConvertAllUrlsBtn": {
-    "message": "सभी URLs को कन्वर्ट करें",
-    "description": "Button label"
+  "popupBatchSubtitle": {
+    "message": "एक साथ कई स्रोतों से सामग्री निकालें।",
+    "description": "Subtitle for the batch processing view"
+  },
+  "popupBatchCloseAria": {
+    "message": "बैच प्रोसेसिंग बंद करें",
+    "description": "ARIA label for closing the batch processing view"
+  },
+  "popupBatchCaptureMethodTitle": {
+    "message": "कैप्चर विधि",
+    "description": "Title for the batch capture method step"
+  },
+  "popupBatchCaptureMethodDesc": {
+    "message": "चुनें कि आप स्रोत कैसे प्रदान करना चाहते हैं।",
+    "description": "Description for the batch capture method step"
+  },
+  "popupBatchCaptureMethodAria": {
+    "message": "कैप्चर विधि",
+    "description": "ARIA label for the batch capture method selector"
+  },
+  "popupBatchManualTitle": {
+    "message": "URL दर्ज करें",
+    "description": "Batch capture method option title for manual URL entry"
+  },
+  "popupBatchManualDesc": {
+    "message": "URL मैन्युअल रूप से टाइप करें या पेस्ट करें",
+    "description": "Batch capture method option description for manual URL entry"
+  },
+  "popupBatchPickTitle": {
+    "message": "लिंक चुनें",
+    "description": "Batch capture method option title for picking links from the page"
+  },
+  "popupBatchPickDesc": {
+    "message": "इस पेज से लिंक निकालें",
+    "description": "Batch capture method option description for picking links from the page"
+  },
+  "popupBatchClickDesc": {
+    "message": "निकालने के लिए एलिमेंट पर क्लिक करें",
+    "description": "Batch capture method option description for Click & Clip"
+  },
+  "popupBatchStepUrlsTitle": {
+    "message": "URLs",
+    "description": "Title for the manual URL input step"
+  },
+  "popupBatchStepUrlsHint": {
+    "message": "प्रत्येक पंक्ति में एक",
+    "description": "Hint for the manual URL input step"
+  },
+  "popupBatchUrlsAria": {
+    "message": "कनवर्ट करने के लिए URLs, प्रत्येक पंक्ति में एक",
+    "description": "ARIA label for the batch URLs textarea"
+  },
+  "popupBatchPickCurrentPageBtn": {
+    "message": "वर्तमान पेज से लिंक चुनें",
+    "description": "Button label for activating the link picker from batch mode"
+  },
+  "popupBatchPickNote": {
+    "message": "लिंक सक्रिय टैब से एकत्र किए जाएंगे।",
+    "description": "Note explaining where picked batch links come from"
+  },
+  "popupBatchNoLinksTitle": {
+    "message": "अभी तक कोई लिंक नहीं चुना गया",
+    "description": "Empty state title for picked batch links"
+  },
+  "popupBatchNoLinksText": {
+    "message": "आपके चुने हुए लिंक यहाँ दिखाई देंगे।",
+    "description": "Empty state text for picked batch links"
+  },
+  "popupBatchClickPanelTitle": {
+    "message": "Click & Clip पेज पर चल रहा है",
+    "description": "Title for the batch Click & Clip explanation panel"
+  },
+  "popupBatchClickPanelDesc": {
+    "message": "शुरू होने पर एलिमेंट पिकर सक्रिय टैब पर खुलेगा। एलिमेंट को कतार में जोड़ने के लिए क्लिक करें, फिर पेज पर मौजूद पैनल से समाप्त करें।",
+    "description": "Description for the batch Click & Clip explanation panel"
+  },
+  "popupBatchOutputFormatTitle": {
+    "message": "आउटपुट फॉर्मेट",
+    "description": "Title for the batch output format step"
+  },
+  "popupBatchOutputFormatDesc": {
+    "message": "चुनें कि परिणाम कैसे सहेजे जाएं।",
+    "description": "Description for the batch output format step"
+  },
+  "popupBatchOutputFormatAria": {
+    "message": "आउटपुट फॉर्मेट",
+    "description": "ARIA label for the batch output format selector"
+  },
+  "popupBatchOutputZipTitle": {
+    "message": "ZIP आर्काइव",
+    "description": "Batch output option title for ZIP archive"
+  },
+  "popupBatchOutputZipDesc": {
+    "message": "सभी परिणाम एक .zip फ़ाइल में",
+    "description": "Batch output option description for ZIP archive"
+  },
+  "popupBatchOutputIndividualTitle": {
+    "message": "अलग-अलग .md फ़ाइलें",
+    "description": "Batch output option title for individual Markdown files"
+  },
+  "popupBatchOutputIndividualDesc": {
+    "message": "प्रत्येक स्रोत के लिए एक Markdown फ़ाइल",
+    "description": "Batch output option description for individual Markdown files"
+  },
+  "popupBatchOutputCombinedTitle": {
+    "message": "संयुक्त .md फ़ाइल",
+    "description": "Batch output option title for a combined Markdown file"
+  },
+  "popupBatchOutputCombinedDesc": {
+    "message": "सभी परिणाम एक Markdown फ़ाइल में",
+    "description": "Batch output option description for a combined Markdown file"
+  },
+  "popupBatchStartProcessingBtn": {
+    "message": "बैच प्रोसेसिंग शुरू करें",
+    "description": "Button label for starting a batch URL or picked-links run"
+  },
+  "popupBatchStepLinksTitle": {
+    "message": "कैप्चर करने के लिए लिंक",
+    "description": "Title for the picked links step"
+  },
+  "popupBatchStepLinksDesc": {
+    "message": "वर्तमान पेज से लिंक एकत्र करें और उन्हें बैच सूची में जोड़ें।",
+    "description": "Description for the picked links step"
+  },
+  "popupBatchStepElementsTitle": {
+    "message": "कैप्चर करने के लिए एलिमेंट",
+    "description": "Title for the Click & Clip step"
+  },
+  "popupBatchStepElementsDesc": {
+    "message": "Click & Clip सीधे सक्रिय टैब पर चलता है।",
+    "description": "Description for the Click & Clip step"
+  },
+  "popupBatchStartClickClipBtn": {
+    "message": "Click & Clip शुरू करें",
+    "description": "Button label for starting Click & Clip from batch mode"
+  },
+  "popupBatchLinksSelectedOne": {
+    "message": "1 लिंक चुना गया",
+    "description": "Picked links count when exactly one link is selected"
+  },
+  "popupBatchLinksSelectedMany": {
+    "message": "$COUNT$ लिंक चुने गए",
+    "description": "Picked links count when zero or many links are selected",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchClearLinksBtn": {
+    "message": "सब साफ़ करें",
+    "description": "Button label for clearing picked links"
+  },
+  "popupBatchRemoveLinkAria": {
+    "message": "लिंक हटाएँ",
+    "description": "ARIA label for removing a picked batch link"
+  },
+  "popupBatchLoadingPage": {
+    "message": "पेज लोड हो रहा है...",
+    "description": "Batch progress status while loading a page"
+  },
+  "popupBatchConvertingPage": {
+    "message": "पेज कनवर्ट हो रहा है...",
+    "description": "Batch progress status while converting a page"
+  },
+  "popupBatchRetryingPage": {
+    "message": "पेज कैप्चर पुनः प्रयास हो रहा है...",
+    "description": "Batch progress status while retrying a page capture"
+  },
+  "popupBatchCreatingZip": {
+    "message": "ZIP आर्काइव बन रहा है...",
+    "description": "Batch progress status while creating the ZIP archive"
+  },
+  "popupBatchCombining": {
+    "message": "संयुक्त दस्तावेज़ बन रहा है...",
+    "description": "Batch progress status while building a combined Markdown document"
+  },
+  "popupBatchWarning": {
+    "message": "रूपांतरण के दौरान चेतावनी",
+    "description": "Fallback batch warning status"
+  },
+  "popupBatchFailedUrl": {
+    "message": "असफल URL",
+    "description": "Fallback label for a failed batch URL"
+  },
+  "popupBatchItemError": {
+    "message": "त्रुटि: $ERROR$",
+    "description": "Batch progress status for an item error",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchCancelled": {
+    "message": "बैच रद्द किया गया",
+    "description": "Batch progress status after cancellation"
+  },
+  "popupBatchUnknownError": {
+    "message": "अज्ञात त्रुटि",
+    "description": "Fallback batch error text"
+  },
+  "popupBatchFailed": {
+    "message": "बैच विफल: $ERROR$",
+    "description": "Batch progress status after failure",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchFinishedWithErrors": {
+    "message": "$COUNT$ त्रुटि(यों) के साथ पूर्ण",
+    "description": "Batch progress status when some URLs failed",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchZipDownloaded": {
+    "message": "ZIP डाउनलोड हो गया",
+    "description": "Batch completion status for ZIP output"
+  },
+  "popupBatchCombinedDownloaded": {
+    "message": "संयुक्त फ़ाइल डाउनलोड हो गई",
+    "description": "Batch completion status for combined Markdown output"
+  },
+  "popupBatchComplete": {
+    "message": "बैच पूर्ण",
+    "description": "Batch completion status for individual file output"
   },
   "popupLibraryTitle": {
     "message": "लाइब्रेरी",
@@ -624,15 +1013,15 @@
     "description": "Input label"
   },
   "optionsColorBlindDeuteranopia": {
-    "message": "Deuteranopia",
+    "message": "डिउटेरेनोपिया",
     "description": "Dropdown option"
   },
   "optionsColorBlindProtanopia": {
-    "message": "Protanopia",
+    "message": "प्रोटेनोपिया",
     "description": "Dropdown option"
   },
   "optionsColorBlindTritanopia": {
-    "message": "Tritanopia",
+    "message": "ट्राइटेनोपिया",
     "description": "Dropdown option"
   },
   "optionsColorBlindHint": {
@@ -912,7 +1301,7 @@
     "description": "Subgroup label — Exports & Integrations section"
   },
   "optionsSubgroupDownloads": {
-    "message": "Downloads",
+    "message": "डाउनलोड",
     "description": "Subgroup label — Exports & Integrations section"
   },
   "optionsSubgroupAssistantIntegration": {

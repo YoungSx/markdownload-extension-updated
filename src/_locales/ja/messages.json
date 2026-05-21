@@ -1,4 +1,181 @@
 {
+  "clickClipBulkBtn": {
+    "message": "コンテナ内をすべて追加",
+    "description": "Button that starts container bulk-selection of triggers"
+  },
+  "clickClipBulkPrompt": {
+    "message": "コンテナをクリックして、その中のすべてのボタンをタグ付けしてください。",
+    "description": "Prompt shown while bulk-selection mode is armed"
+  },
+  "clickClipBulkNone": {
+    "message": "そのコンテナにはボタンが見つかりませんでした。",
+    "description": "Shown when bulk-selection finds no clickable elements"
+  },
+  "popupAlertFailedToActivateClickClip": {
+    "message": "Click & Clipを有効にできませんでした。もう一度お試しください。",
+    "description": "Alert message when Click & Clip fails to activate"
+  },
+  "clickClipTitle": {
+    "message": "Click & Clip",
+    "description": "Title for the in-page Click & Clip picker panel"
+  },
+  "clickClipWarning": {
+    "message": "タグしたボタンをクリックします。フォーム送信や購入が発生するページでの使用は避けてください。",
+    "description": "Safety warning shown in the Click & Clip panel"
+  },
+  "clickClipPickInfo": {
+    "message": "ページのボタン/タブをクリックしてタグ付けしてください。",
+    "description": "Instruction shown before any triggers are tagged"
+  },
+  "clickClipTaggedCount": {
+    "message": "$COUNT$個のボタンをタグ付け済み",
+    "description": "Count of tagged trigger buttons",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipPatternLabel": {
+    "message": "パターン",
+    "description": "Label for the interaction-pattern selector"
+  },
+  "clickClipPatternAuto": {
+    "message": "自動検出",
+    "description": "Pattern option: automatically detect the interaction pattern"
+  },
+  "clickClipPatternTabs": {
+    "message": "タブ / パネル",
+    "description": "Pattern option: tabbed content"
+  },
+  "clickClipPatternAccordion": {
+    "message": "アコーディオン",
+    "description": "Pattern option: accordion / expandable sections"
+  },
+  "clickClipPatternLoadMore": {
+    "message": "もっと読み込む",
+    "description": "Pattern option: a load-more button clicked repeatedly"
+  },
+  "clickClipPatternPagination": {
+    "message": "ページネーション",
+    "description": "Pattern option: next-page pagination"
+  },
+  "clickClipOutputLabel": {
+    "message": "出力",
+    "description": "Label for the output-mode selector"
+  },
+  "clickClipOutputFiles": {
+    "message": "ボタンごとにファイル",
+    "description": "Output option: one markdown file per button"
+  },
+  "clickClipOutputCombined": {
+    "message": "結合ドキュメント",
+    "description": "Output option: a single combined markdown document"
+  },
+  "clickClipCancelBtn": {
+    "message": "キャンセル",
+    "description": "Click & Clip cancel button"
+  },
+  "clickClipTestBtn": {
+    "message": "まずテスト",
+    "description": "Click & Clip button that dry-runs the first trigger"
+  },
+  "clickClipStartBtn": {
+    "message": "開始",
+    "description": "Click & Clip button that starts the run"
+  },
+  "clickClipMoveUp": {
+    "message": "上に移動",
+    "description": "Tooltip for moving a trigger up in the list"
+  },
+  "clickClipMoveDown": {
+    "message": "下に移動",
+    "description": "Tooltip for moving a trigger down in the list"
+  },
+  "clickClipRemove": {
+    "message": "削除",
+    "description": "Tooltip for removing a trigger from the list"
+  },
+  "clickClipRejectLink": {
+    "message": "このリンクは別ページに移動します — リンクにはバッチ処理を使用してください。",
+    "description": "Shown when the user tries to tag a real navigational link"
+  },
+  "clickClipRunning": {
+    "message": "実行中…",
+    "description": "Status while the Click & Clip run is in progress"
+  },
+  "clickClipRunningItem": {
+    "message": "$TOTAL$件中$CURRENT$件を処理中…",
+    "description": "Per-item progress during a Click & Clip run",
+    "placeholders": {
+      "current": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "clickClipRunningLoadMore": {
+    "message": "$COUNT$回読み込みました…",
+    "description": "Progress for the load-more pattern",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipRunningPage": {
+    "message": "ページ $PAGE$ をキャプチャしました…",
+    "description": "Progress for the pagination pattern",
+    "placeholders": {
+      "page": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipNavAborted": {
+    "message": "クリックでページが移動しました — 停止しています。",
+    "description": "Shown when a click caused navigation and the run was aborted"
+  },
+  "clickClipFinalizing": {
+    "message": "保存中…",
+    "description": "Status while the captured items are being saved"
+  },
+  "clickClipSuccess": {
+    "message": "完了 — $COUNT$件をクリップしました。",
+    "description": "Success message after a Click & Clip run",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipNothingCaptured": {
+    "message": "何もキャプチャされませんでした。",
+    "description": "Shown when a Click & Clip run produced no content"
+  },
+  "clickClipRunFailed": {
+    "message": "Click & Clipに失敗しました。コンソールを確認してください。",
+    "description": "Shown when a Click & Clip run fails"
+  },
+  "clickClipTesting": {
+    "message": "最初のボタンをテスト中…",
+    "description": "Status during the Test-first dry run"
+  },
+  "clickClipTestResult": {
+    "message": "このページ状態をクリップする準備ができています（$COUNT$文字）。",
+    "description": "Result of the Test-first page-state dry run",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipTestNoRegion": {
+    "message": "最初のボタンのページ状態をキャプチャできませんでした。",
+    "description": "Shown when the Test-first dry run cannot capture the page state"
+  },
   "extensionName": {
     "message": "MarkSnip - Markdown ウェブクリッパー",
     "description": "The name of the extension"
@@ -303,25 +480,9 @@
     "message": "バッチ処理",
     "description": "Title for batch processing section"
   },
-  "popupUrlsLabel": {
-    "message": "URL (1行に1つ)",
-    "description": "Label for batch URLs textarea"
-  },
   "popupUrlsPlaceholder": {
     "message": "https://example.com/page1\nhttps://example.com/page2\n\nまたはMarkdownリンクを使用:\n[ページタイトル](https://example.com)",
     "description": "Placeholder for batch URLs textarea"
-  },
-  "popupPickLinksBtn": {
-    "message": "ページからリンクを選択",
-    "description": "Button label"
-  },
-  "popupBatchSaveZip": {
-    "message": "ZIPファイル",
-    "description": "Toggle option for batch save mode"
-  },
-  "popupBatchSaveIndividual": {
-    "message": "個別のファイル",
-    "description": "Toggle option for batch save mode"
   },
   "popupProgressProcessing": {
     "message": "処理中...",
@@ -331,9 +492,237 @@
     "message": "キャンセル",
     "description": "Button label"
   },
-  "popupConvertAllUrlsBtn": {
-    "message": "すべてのURLを変換",
-    "description": "Button label"
+  "popupBatchSubtitle": {
+    "message": "複数のソースからコンテンツを一度に抽出します。",
+    "description": "Subtitle for the batch processing view"
+  },
+  "popupBatchCloseAria": {
+    "message": "バッチ処理を閉じる",
+    "description": "ARIA label for closing the batch processing view"
+  },
+  "popupBatchCaptureMethodTitle": {
+    "message": "キャプチャ方法",
+    "description": "Title for the batch capture method step"
+  },
+  "popupBatchCaptureMethodDesc": {
+    "message": "ソースの提供方法を選択してください。",
+    "description": "Description for the batch capture method step"
+  },
+  "popupBatchCaptureMethodAria": {
+    "message": "キャプチャ方法",
+    "description": "ARIA label for the batch capture method selector"
+  },
+  "popupBatchManualTitle": {
+    "message": "URL入力",
+    "description": "Batch capture method option title for manual URL entry"
+  },
+  "popupBatchManualDesc": {
+    "message": "URLを手動で入力または貼り付ける",
+    "description": "Batch capture method option description for manual URL entry"
+  },
+  "popupBatchPickTitle": {
+    "message": "リンクを選択",
+    "description": "Batch capture method option title for picking links from the page"
+  },
+  "popupBatchPickDesc": {
+    "message": "このページからリンクを抽出",
+    "description": "Batch capture method option description for picking links from the page"
+  },
+  "popupBatchClickDesc": {
+    "message": "要素をクリックして抽出",
+    "description": "Batch capture method option description for Click & Clip"
+  },
+  "popupBatchStepUrlsTitle": {
+    "message": "URL",
+    "description": "Title for the manual URL input step"
+  },
+  "popupBatchStepUrlsHint": {
+    "message": "1行に1つ",
+    "description": "Hint for the manual URL input step"
+  },
+  "popupBatchUrlsAria": {
+    "message": "変換するURL（1行に1つ）",
+    "description": "ARIA label for the batch URLs textarea"
+  },
+  "popupBatchPickCurrentPageBtn": {
+    "message": "現在のページからリンクを選択",
+    "description": "Button label for activating the link picker from batch mode"
+  },
+  "popupBatchPickNote": {
+    "message": "アクティブなタブからリンクが収集されます。",
+    "description": "Note explaining where picked batch links come from"
+  },
+  "popupBatchNoLinksTitle": {
+    "message": "まだリンクが選択されていません",
+    "description": "Empty state title for picked batch links"
+  },
+  "popupBatchNoLinksText": {
+    "message": "選択したリンクがここに表示されます。",
+    "description": "Empty state text for picked batch links"
+  },
+  "popupBatchClickPanelTitle": {
+    "message": "Click & Clipがページで実行中",
+    "description": "Title for the batch Click & Clip explanation panel"
+  },
+  "popupBatchClickPanelDesc": {
+    "message": "開始すると、要素ピッカーがアクティブなタブで開きます。要素をクリックしてキューに追加し、ページ内パネルから完了してください。",
+    "description": "Description for the batch Click & Clip explanation panel"
+  },
+  "popupBatchOutputFormatTitle": {
+    "message": "出力形式",
+    "description": "Title for the batch output format step"
+  },
+  "popupBatchOutputFormatDesc": {
+    "message": "結果の保存方法を選択してください。",
+    "description": "Description for the batch output format step"
+  },
+  "popupBatchOutputFormatAria": {
+    "message": "出力形式",
+    "description": "ARIA label for the batch output format selector"
+  },
+  "popupBatchOutputZipTitle": {
+    "message": "ZIPアーカイブ",
+    "description": "Batch output option title for ZIP archive"
+  },
+  "popupBatchOutputZipDesc": {
+    "message": "すべての結果を1つの.zipファイルにまとめる",
+    "description": "Batch output option description for ZIP archive"
+  },
+  "popupBatchOutputIndividualTitle": {
+    "message": "個別の.mdファイル",
+    "description": "Batch output option title for individual Markdown files"
+  },
+  "popupBatchOutputIndividualDesc": {
+    "message": "ソースごとに1つのMarkdownファイル",
+    "description": "Batch output option description for individual Markdown files"
+  },
+  "popupBatchOutputCombinedTitle": {
+    "message": "結合した.mdファイル",
+    "description": "Batch output option title for a combined Markdown file"
+  },
+  "popupBatchOutputCombinedDesc": {
+    "message": "すべての結果を1つのMarkdownファイルにまとめる",
+    "description": "Batch output option description for a combined Markdown file"
+  },
+  "popupBatchStartProcessingBtn": {
+    "message": "バッチ処理を開始",
+    "description": "Button label for starting a batch URL or picked-links run"
+  },
+  "popupBatchStepLinksTitle": {
+    "message": "キャプチャするリンク",
+    "description": "Title for the picked links step"
+  },
+  "popupBatchStepLinksDesc": {
+    "message": "現在のページからリンクを収集し、バッチリストに追加します。",
+    "description": "Description for the picked links step"
+  },
+  "popupBatchStepElementsTitle": {
+    "message": "キャプチャする要素",
+    "description": "Title for the Click & Clip step"
+  },
+  "popupBatchStepElementsDesc": {
+    "message": "Click & Clipはアクティブなタブで直接実行されます。",
+    "description": "Description for the Click & Clip step"
+  },
+  "popupBatchStartClickClipBtn": {
+    "message": "Click & Clipを開始",
+    "description": "Button label for starting Click & Clip from batch mode"
+  },
+  "popupBatchLinksSelectedOne": {
+    "message": "1件のリンクを選択済み",
+    "description": "Picked links count when exactly one link is selected"
+  },
+  "popupBatchLinksSelectedMany": {
+    "message": "$COUNT$件のリンクを選択済み",
+    "description": "Picked links count when zero or many links are selected",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchClearLinksBtn": {
+    "message": "すべてクリア",
+    "description": "Button label for clearing picked links"
+  },
+  "popupBatchRemoveLinkAria": {
+    "message": "リンクを削除",
+    "description": "ARIA label for removing a picked batch link"
+  },
+  "popupBatchLoadingPage": {
+    "message": "ページを読み込み中...",
+    "description": "Batch progress status while loading a page"
+  },
+  "popupBatchConvertingPage": {
+    "message": "ページを変換中...",
+    "description": "Batch progress status while converting a page"
+  },
+  "popupBatchRetryingPage": {
+    "message": "ページキャプチャを再試行中...",
+    "description": "Batch progress status while retrying a page capture"
+  },
+  "popupBatchCreatingZip": {
+    "message": "ZIPアーカイブを作成中...",
+    "description": "Batch progress status while creating the ZIP archive"
+  },
+  "popupBatchCombining": {
+    "message": "結合ドキュメントを作成中...",
+    "description": "Batch progress status while building a combined Markdown document"
+  },
+  "popupBatchWarning": {
+    "message": "変換中に警告が発生しました",
+    "description": "Fallback batch warning status"
+  },
+  "popupBatchFailedUrl": {
+    "message": "失敗したURL",
+    "description": "Fallback label for a failed batch URL"
+  },
+  "popupBatchItemError": {
+    "message": "エラー: $ERROR$",
+    "description": "Batch progress status for an item error",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchCancelled": {
+    "message": "バッチをキャンセルしました",
+    "description": "Batch progress status after cancellation"
+  },
+  "popupBatchUnknownError": {
+    "message": "不明なエラー",
+    "description": "Fallback batch error text"
+  },
+  "popupBatchFailed": {
+    "message": "バッチ処理に失敗しました: $ERROR$",
+    "description": "Batch progress status after failure",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchFinishedWithErrors": {
+    "message": "$COUNT$件のエラーで完了しました",
+    "description": "Batch progress status when some URLs failed",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchZipDownloaded": {
+    "message": "ZIPをダウンロードしました",
+    "description": "Batch completion status for ZIP output"
+  },
+  "popupBatchCombinedDownloaded": {
+    "message": "結合ファイルをダウンロードしました",
+    "description": "Batch completion status for combined Markdown output"
+  },
+  "popupBatchComplete": {
+    "message": "バッチ処理完了",
+    "description": "Batch completion status for individual file output"
   },
   "popupLibraryTitle": {
     "message": "ライブラリ",

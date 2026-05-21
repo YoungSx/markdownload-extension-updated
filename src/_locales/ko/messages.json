@@ -1,4 +1,181 @@
 {
+  "clickClipBulkBtn": {
+    "message": "컨테이너 내 모두 추가",
+    "description": "Button that starts container bulk-selection of triggers"
+  },
+  "clickClipBulkPrompt": {
+    "message": "컨테이너를 클릭하면 안에 있는 모든 버튼이 태그됩니다.",
+    "description": "Prompt shown while bulk-selection mode is armed"
+  },
+  "clickClipBulkNone": {
+    "message": "해당 컨테이너에서 버튼을 찾을 수 없습니다.",
+    "description": "Shown when bulk-selection finds no clickable elements"
+  },
+  "popupAlertFailedToActivateClickClip": {
+    "message": "Click & Clip을 활성화하지 못했습니다. 다시 시도해 주세요.",
+    "description": "Alert message when Click & Clip fails to activate"
+  },
+  "clickClipTitle": {
+    "message": "Click & Clip",
+    "description": "Title for the in-page Click & Clip picker panel"
+  },
+  "clickClipWarning": {
+    "message": "태그한 버튼을 클릭합니다. 클릭으로 양식이 제출되거나 구매가 발생하는 페이지는 피하세요.",
+    "description": "Safety warning shown in the Click & Clip panel"
+  },
+  "clickClipPickInfo": {
+    "message": "페이지의 버튼/탭을 클릭하여 태그하세요.",
+    "description": "Instruction shown before any triggers are tagged"
+  },
+  "clickClipTaggedCount": {
+    "message": "버튼 $COUNT$개 태그됨",
+    "description": "Count of tagged trigger buttons",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipPatternLabel": {
+    "message": "패턴",
+    "description": "Label for the interaction-pattern selector"
+  },
+  "clickClipPatternAuto": {
+    "message": "자동 감지",
+    "description": "Pattern option: automatically detect the interaction pattern"
+  },
+  "clickClipPatternTabs": {
+    "message": "탭 / 패널",
+    "description": "Pattern option: tabbed content"
+  },
+  "clickClipPatternAccordion": {
+    "message": "아코디언",
+    "description": "Pattern option: accordion / expandable sections"
+  },
+  "clickClipPatternLoadMore": {
+    "message": "더 불러오기",
+    "description": "Pattern option: a load-more button clicked repeatedly"
+  },
+  "clickClipPatternPagination": {
+    "message": "페이지네이션",
+    "description": "Pattern option: next-page pagination"
+  },
+  "clickClipOutputLabel": {
+    "message": "출력",
+    "description": "Label for the output-mode selector"
+  },
+  "clickClipOutputFiles": {
+    "message": "버튼당 파일",
+    "description": "Output option: one markdown file per button"
+  },
+  "clickClipOutputCombined": {
+    "message": "통합 문서",
+    "description": "Output option: a single combined markdown document"
+  },
+  "clickClipCancelBtn": {
+    "message": "취소",
+    "description": "Click & Clip cancel button"
+  },
+  "clickClipTestBtn": {
+    "message": "먼저 테스트",
+    "description": "Click & Clip button that dry-runs the first trigger"
+  },
+  "clickClipStartBtn": {
+    "message": "시작",
+    "description": "Click & Clip button that starts the run"
+  },
+  "clickClipMoveUp": {
+    "message": "위로 이동",
+    "description": "Tooltip for moving a trigger up in the list"
+  },
+  "clickClipMoveDown": {
+    "message": "아래로 이동",
+    "description": "Tooltip for moving a trigger down in the list"
+  },
+  "clickClipRemove": {
+    "message": "제거",
+    "description": "Tooltip for removing a trigger from the list"
+  },
+  "clickClipRejectLink": {
+    "message": "이 링크는 다른 페이지로 이동합니다 — 링크에는 일괄 처리를 사용하세요.",
+    "description": "Shown when the user tries to tag a real navigational link"
+  },
+  "clickClipRunning": {
+    "message": "실행 중…",
+    "description": "Status while the Click & Clip run is in progress"
+  },
+  "clickClipRunningItem": {
+    "message": "$TOTAL$개 중 $CURRENT$번째 처리 중…",
+    "description": "Per-item progress during a Click & Clip run",
+    "placeholders": {
+      "current": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "clickClipRunningLoadMore": {
+    "message": "$COUNT$회 불러왔습니다…",
+    "description": "Progress for the load-more pattern",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipRunningPage": {
+    "message": "$PAGE$번째 페이지 캡처됨…",
+    "description": "Progress for the pagination pattern",
+    "placeholders": {
+      "page": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipNavAborted": {
+    "message": "클릭으로 페이지가 이동했습니다 — 중지합니다.",
+    "description": "Shown when a click caused navigation and the run was aborted"
+  },
+  "clickClipFinalizing": {
+    "message": "저장 중…",
+    "description": "Status while the captured items are being saved"
+  },
+  "clickClipSuccess": {
+    "message": "완료 — $COUNT$개 항목 클립됨.",
+    "description": "Success message after a Click & Clip run",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipNothingCaptured": {
+    "message": "캡처된 내용이 없습니다.",
+    "description": "Shown when a Click & Clip run produced no content"
+  },
+  "clickClipRunFailed": {
+    "message": "Click & Clip 실패. 콘솔을 확인하세요.",
+    "description": "Shown when a Click & Clip run fails"
+  },
+  "clickClipTesting": {
+    "message": "첫 번째 버튼 테스트 중…",
+    "description": "Status during the Test-first dry run"
+  },
+  "clickClipTestResult": {
+    "message": "이 페이지 상태를 클립할 준비가 되었습니다($COUNT$자).",
+    "description": "Result of the Test-first page-state dry run",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "clickClipTestNoRegion": {
+    "message": "첫 번째 버튼의 페이지 상태를 캡처할 수 없습니다.",
+    "description": "Shown when the Test-first dry run cannot capture the page state"
+  },
   "extensionName": {
     "message": "MarkSnip - 마크다운 웹 클리퍼",
     "description": "The name of the extension"
@@ -303,25 +480,9 @@
     "message": "일괄 처리",
     "description": "Title for batch processing section"
   },
-  "popupUrlsLabel": {
-    "message": "URL (한 줄에 하나씩)",
-    "description": "Label for batch URLs textarea"
-  },
   "popupUrlsPlaceholder": {
     "message": "https://example.com/page1\nhttps://example.com/page2\n\n또는 마크다운 링크를 사용하세요:\n[페이지 제목](https://example.com)",
     "description": "Placeholder for batch URLs textarea"
-  },
-  "popupPickLinksBtn": {
-    "message": "페이지에서 링크 선택",
-    "description": "Button label"
-  },
-  "popupBatchSaveZip": {
-    "message": "ZIP 파일",
-    "description": "Toggle option for batch save mode"
-  },
-  "popupBatchSaveIndividual": {
-    "message": "개별 파일",
-    "description": "Toggle option for batch save mode"
   },
   "popupProgressProcessing": {
     "message": "처리 중...",
@@ -331,9 +492,237 @@
     "message": "취소",
     "description": "Button label"
   },
-  "popupConvertAllUrlsBtn": {
-    "message": "모든 URL 변환",
-    "description": "Button label"
+  "popupBatchSubtitle": {
+    "message": "여러 소스에서 동시에 콘텐츠를 추출합니다.",
+    "description": "Subtitle for the batch processing view"
+  },
+  "popupBatchCloseAria": {
+    "message": "일괄 처리 닫기",
+    "description": "ARIA label for closing the batch processing view"
+  },
+  "popupBatchCaptureMethodTitle": {
+    "message": "캡처 방법",
+    "description": "Title for the batch capture method step"
+  },
+  "popupBatchCaptureMethodDesc": {
+    "message": "소스를 제공할 방법을 선택하세요.",
+    "description": "Description for the batch capture method step"
+  },
+  "popupBatchCaptureMethodAria": {
+    "message": "캡처 방법",
+    "description": "ARIA label for the batch capture method selector"
+  },
+  "popupBatchManualTitle": {
+    "message": "URL 입력",
+    "description": "Batch capture method option title for manual URL entry"
+  },
+  "popupBatchManualDesc": {
+    "message": "URL을 직접 입력하거나 붙여넣기",
+    "description": "Batch capture method option description for manual URL entry"
+  },
+  "popupBatchPickTitle": {
+    "message": "링크 선택",
+    "description": "Batch capture method option title for picking links from the page"
+  },
+  "popupBatchPickDesc": {
+    "message": "이 페이지에서 링크 추출",
+    "description": "Batch capture method option description for picking links from the page"
+  },
+  "popupBatchClickDesc": {
+    "message": "요소를 클릭하여 추출",
+    "description": "Batch capture method option description for Click & Clip"
+  },
+  "popupBatchStepUrlsTitle": {
+    "message": "URL",
+    "description": "Title for the manual URL input step"
+  },
+  "popupBatchStepUrlsHint": {
+    "message": "한 줄에 하나씩",
+    "description": "Hint for the manual URL input step"
+  },
+  "popupBatchUrlsAria": {
+    "message": "변환할 URL(한 줄에 하나씩)",
+    "description": "ARIA label for the batch URLs textarea"
+  },
+  "popupBatchPickCurrentPageBtn": {
+    "message": "현재 페이지에서 링크 선택",
+    "description": "Button label for activating the link picker from batch mode"
+  },
+  "popupBatchPickNote": {
+    "message": "활성 탭에서 링크가 수집됩니다.",
+    "description": "Note explaining where picked batch links come from"
+  },
+  "popupBatchNoLinksTitle": {
+    "message": "아직 선택된 링크 없음",
+    "description": "Empty state title for picked batch links"
+  },
+  "popupBatchNoLinksText": {
+    "message": "선택한 링크가 여기에 표시됩니다.",
+    "description": "Empty state text for picked batch links"
+  },
+  "popupBatchClickPanelTitle": {
+    "message": "Click & Clip이 페이지에서 실행 중",
+    "description": "Title for the batch Click & Clip explanation panel"
+  },
+  "popupBatchClickPanelDesc": {
+    "message": "시작하면 요소 선택기가 활성 탭에서 열립니다. 요소를 클릭하여 대기열에 추가한 후 페이지 내 패널에서 완료하세요.",
+    "description": "Description for the batch Click & Clip explanation panel"
+  },
+  "popupBatchOutputFormatTitle": {
+    "message": "출력 형식",
+    "description": "Title for the batch output format step"
+  },
+  "popupBatchOutputFormatDesc": {
+    "message": "결과를 저장하는 방법을 선택하세요.",
+    "description": "Description for the batch output format step"
+  },
+  "popupBatchOutputFormatAria": {
+    "message": "출력 형식",
+    "description": "ARIA label for the batch output format selector"
+  },
+  "popupBatchOutputZipTitle": {
+    "message": "ZIP 아카이브",
+    "description": "Batch output option title for ZIP archive"
+  },
+  "popupBatchOutputZipDesc": {
+    "message": "모든 결과를 하나의 .zip 파일로",
+    "description": "Batch output option description for ZIP archive"
+  },
+  "popupBatchOutputIndividualTitle": {
+    "message": "개별 .md 파일",
+    "description": "Batch output option title for individual Markdown files"
+  },
+  "popupBatchOutputIndividualDesc": {
+    "message": "소스당 하나의 Markdown 파일",
+    "description": "Batch output option description for individual Markdown files"
+  },
+  "popupBatchOutputCombinedTitle": {
+    "message": "통합 .md 파일",
+    "description": "Batch output option title for a combined Markdown file"
+  },
+  "popupBatchOutputCombinedDesc": {
+    "message": "모든 결과를 하나의 Markdown 파일로",
+    "description": "Batch output option description for a combined Markdown file"
+  },
+  "popupBatchStartProcessingBtn": {
+    "message": "일괄 처리 시작",
+    "description": "Button label for starting a batch URL or picked-links run"
+  },
+  "popupBatchStepLinksTitle": {
+    "message": "캡처할 링크",
+    "description": "Title for the picked links step"
+  },
+  "popupBatchStepLinksDesc": {
+    "message": "현재 페이지에서 링크를 수집하여 일괄 목록에 추가하세요.",
+    "description": "Description for the picked links step"
+  },
+  "popupBatchStepElementsTitle": {
+    "message": "캡처할 요소",
+    "description": "Title for the Click & Clip step"
+  },
+  "popupBatchStepElementsDesc": {
+    "message": "Click & Clip이 활성 탭에서 직접 실행됩니다.",
+    "description": "Description for the Click & Clip step"
+  },
+  "popupBatchStartClickClipBtn": {
+    "message": "Click & Clip 시작",
+    "description": "Button label for starting Click & Clip from batch mode"
+  },
+  "popupBatchLinksSelectedOne": {
+    "message": "링크 1개 선택됨",
+    "description": "Picked links count when exactly one link is selected"
+  },
+  "popupBatchLinksSelectedMany": {
+    "message": "링크 $COUNT$개 선택됨",
+    "description": "Picked links count when zero or many links are selected",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchClearLinksBtn": {
+    "message": "모두 지우기",
+    "description": "Button label for clearing picked links"
+  },
+  "popupBatchRemoveLinkAria": {
+    "message": "링크 제거",
+    "description": "ARIA label for removing a picked batch link"
+  },
+  "popupBatchLoadingPage": {
+    "message": "페이지 불러오는 중...",
+    "description": "Batch progress status while loading a page"
+  },
+  "popupBatchConvertingPage": {
+    "message": "페이지 변환 중...",
+    "description": "Batch progress status while converting a page"
+  },
+  "popupBatchRetryingPage": {
+    "message": "페이지 캡처 재시도 중...",
+    "description": "Batch progress status while retrying a page capture"
+  },
+  "popupBatchCreatingZip": {
+    "message": "ZIP 아카이브 생성 중...",
+    "description": "Batch progress status while creating the ZIP archive"
+  },
+  "popupBatchCombining": {
+    "message": "통합 문서 생성 중...",
+    "description": "Batch progress status while building a combined Markdown document"
+  },
+  "popupBatchWarning": {
+    "message": "변환 중 경고 발생",
+    "description": "Fallback batch warning status"
+  },
+  "popupBatchFailedUrl": {
+    "message": "실패한 URL",
+    "description": "Fallback label for a failed batch URL"
+  },
+  "popupBatchItemError": {
+    "message": "오류: $ERROR$",
+    "description": "Batch progress status for an item error",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchCancelled": {
+    "message": "일괄 처리 취소됨",
+    "description": "Batch progress status after cancellation"
+  },
+  "popupBatchUnknownError": {
+    "message": "알 수 없는 오류",
+    "description": "Fallback batch error text"
+  },
+  "popupBatchFailed": {
+    "message": "일괄 처리 실패: $ERROR$",
+    "description": "Batch progress status after failure",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchFinishedWithErrors": {
+    "message": "$COUNT$개의 오류와 함께 완료",
+    "description": "Batch progress status when some URLs failed",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupBatchZipDownloaded": {
+    "message": "ZIP 다운로드 완료",
+    "description": "Batch completion status for ZIP output"
+  },
+  "popupBatchCombinedDownloaded": {
+    "message": "통합 파일 다운로드 완료",
+    "description": "Batch completion status for combined Markdown output"
+  },
+  "popupBatchComplete": {
+    "message": "일괄 처리 완료",
+    "description": "Batch completion status for individual file output"
   },
   "popupLibraryTitle": {
     "message": "라이브러리",
